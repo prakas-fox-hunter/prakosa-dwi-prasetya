@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import PrakosaLogo from '@/components/PrakosaLogo.vue'
 
 type Theme = 'light' | 'dark'
 type ProjectCategory = 'backend' | 'data' | 'delivery'
@@ -9,12 +10,10 @@ type Project = {
   name: string
   code: string
   context: string
-  summary: string
   detail: string
   categories: ProjectCategory[]
   technologies: string[]
   contributions: string[]
-  tone: string
 }
 
 const email = 'prakosadwiprasetya@gmail.com'
@@ -27,162 +26,143 @@ const navItems = [
   { id: 'experience', label: 'Perjalanan' },
 ]
 
-const capabilities = [
-  {
-    number: '01',
-    title: 'Backend systems',
-    description: 'REST API dan scheduler yang mudah diuji dan dipelihara.',
-    tags: ['Java', 'Spring Boot', 'Quarkus', 'REST API'],
-  },
-  {
-    number: '02',
-    title: 'Data engineering',
-    description: 'Table, view, function, dan cursor untuk aplikasi bisnis.',
-    tags: ['PostgreSQL', 'Oracle', 'SQL', 'Data flow'],
-  },
-  {
-    number: '03',
-    title: 'Delivery pipeline',
-    description: 'Source code, CI/CD, container, dan deployment aplikasi.',
-    tags: ['GitLab CI/CD', 'Docker', 'OpenShift', 'Git'],
-  },
-  {
-    number: '04',
-    title: 'Integration support',
-    description: 'Pengujian endpoint dan troubleshooting alur integrasi.',
-    tags: ['Postman', 'Vue.js', 'GWT', 'TIBCO'],
-  },
+const tools: { name: string; slug: string; color: string; mark: string; customLogo?: boolean }[] = [
+  { name: 'Docker', slug: 'docker', color: '2496ED', mark: 'D' },
+  { name: 'GitHub', slug: 'github', color: '181717', mark: 'GH' },
+  { name: 'Ubuntu', slug: 'ubuntu', color: 'E95420', mark: 'U' },
+  { name: 'Java / Spring Boot', slug: 'springboot', color: '6DB33F', mark: 'SB' },
+  { name: 'Vue.js', slug: 'vuedotjs', color: '4FC08D', mark: 'V' },
+  { name: 'Dart', slug: 'dart', color: '0175C2', mark: 'D' },
+  { name: 'Flutter', slug: 'flutter', color: '02569B', mark: 'F' },
+  { name: 'WinSCP', slug: 'winscp', color: '73BA25', mark: 'W' },
+  { name: 'SSH Remote', slug: 'openssh', color: 'EE7A00', mark: 'SSH' },
+  { name: 'Hyper-V', slug: '', color: '0078D4', mark: 'HV' },
+  { name: 'GitLab', slug: 'gitlab', color: 'FC6D26', mark: 'GL' },
 ]
+
+const brokenToolLogos = ref<string[]>([])
+
+function markToolLogoBroken(toolName: string) {
+  brokenToolLogos.value = [...brokenToolLogos.value, toolName]
+}
 
 const projects: Project[] = [
   {
     id: 'hse',
     name: 'HSE',
     code: 'HS',
-    context: 'Enterprise application',
-    summary: 'Pengembangan dan pemeliharaan aplikasi bisnis.',
-    detail: 'Implementasi kebutuhan, integrasi fungsi, dan analisis kendala aplikasi enterprise.',
+    context: 'Aplikasi bisnis',
+    detail: 'Menerjemahkan kebutuhan menjadi fitur, menghubungkan berbagai fungsi, dan membantu mengatasi kendala aplikasi.',
     categories: ['backend', 'delivery'],
     technologies: ['Java', 'REST API', 'Integration'],
     contributions: [
-      'Mengembangkan dan memelihara fungsi aplikasi.',
-      'Menerjemahkan kebutuhan bisnis menjadi solusi teknis.',
-      'Menganalisis serta menyelesaikan kendala aplikasi.',
+      'Mengembangkan dan merawat fitur aplikasi.',
+      'Mengubah kebutuhan bisnis menjadi solusi teknis.',
+      'Mencari penyebab dan memperbaiki kendala aplikasi.',
     ],
-    tone: 'cyan',
   },
   {
     id: 'sdcos',
     name: 'SDCOS',
     code: 'SD',
-    context: 'Backend & integration',
-    summary: 'Backend, integrasi layanan, dan pengolahan data.',
-    detail: 'Pengembangan fitur, integrasi layanan, pengolahan data, dan troubleshooting.',
+    context: 'Backend dan integrasi layanan',
+    detail: 'Membangun fitur backend, menghubungkan layanan, mengolah data, dan mengatasi kendala aplikasi.',
     categories: ['backend', 'data'],
     technologies: ['Java', 'Database', 'API'],
     contributions: [
-      'Mendukung pengembangan fitur aplikasi.',
-      'Berpartisipasi dalam integrasi layanan dan data.',
-      'Mendukung troubleshooting dan pemeliharaan.',
+      'Membantu mengembangkan fitur aplikasi.',
+      'Menghubungkan layanan dan data.',
+      'Mencari penyebab masalah dan merawat aplikasi.',
     ],
-    tone: 'blue',
   },
   {
     id: 'klick-indomaret',
     name: 'Klick Indomaret',
     code: 'KI',
-    context: 'Food ordering platform',
-    summary: 'REST API untuk klik-order-food dan klik-order-view.',
-    detail: 'Layanan Spring Boot dengan PostgreSQL, Oracle, dan pengujian melalui Postman.',
+    context: 'Platform pemesanan makanan',
+    detail: 'Membangun layanan Spring Boot dengan PostgreSQL dan Oracle, lalu menguji API menggunakan Postman.',
     categories: ['backend', 'data'],
     technologies: ['Spring Boot', 'PostgreSQL', 'Oracle', 'Postman'],
     contributions: [
       'Mengembangkan REST API menggunakan Spring Boot.',
-      'Membuat table, view, function, dan cursor.',
-      'Melakukan pengujian dan validasi API dengan Postman.',
+      'Menyiapkan tabel, view, function, dan cursor di database.',
+      'Menguji API dengan Postman.',
     ],
-    tone: 'lime',
   },
   {
     id: 'ap2t',
     name: 'AP2T',
     code: 'A2',
-    context: 'Large-scale service platform',
-    summary: 'API, scheduler, database, dan delivery enterprise.',
-    detail: 'REST API dan scheduler dengan Spring Boot, Quarkus, database, dan GitLab CI/CD.',
+    context: 'Platform layanan skala besar',
+    detail: 'Mengembangkan REST API dan tugas terjadwal dengan Spring Boot dan Quarkus, mengelola database, serta menyiapkan rilis lewat GitLab CI/CD.',
     categories: ['backend', 'data', 'delivery'],
     technologies: ['Spring Boot', 'Quarkus', 'GitLab CI/CD', 'Oracle'],
     contributions: [
-      'Mengembangkan REST API dan scheduler.',
-      'Mengelola PostgreSQL dan Oracle Database.',
-      'Menjalankan deployment melalui GitLab CI/CD.',
+      'Membangun REST API dan tugas terjadwal.',
+      'Mengelola database PostgreSQL dan Oracle.',
+      'Merilis aplikasi lewat GitLab CI/CD.',
     ],
-    tone: 'violet',
   },
   {
     id: 'newito',
     name: 'NEWITO',
     code: 'NW',
-    context: 'Business application',
-    summary: 'Backend, scheduler, database, dan CI/CD.',
-    detail: 'Endpoint, scheduler, object database, API testing, dan delivery aplikasi.',
+    context: 'Aplikasi bisnis',
+    detail: 'Membangun API, mengatur tugas otomatis, menyiapkan database, serta membantu menguji dan merilis aplikasi.',
     categories: ['backend', 'data', 'delivery'],
     technologies: ['Java', 'Scheduler', 'PostgreSQL', 'GitLab'],
     contributions: [
-      'Mengembangkan REST API serta scheduler.',
-      'Membuat object database PostgreSQL dan Oracle.',
-      'Mendukung pengujian dan deployment aplikasi.',
+      'Membangun REST API dan tugas terjadwal.',
+      'Menyiapkan objek database di PostgreSQL dan Oracle.',
+      'Menguji dan merilis aplikasi.',
     ],
-    tone: 'orange',
   },
   {
     id: 'emis-kemenag',
     name: 'EMIS Kemenag',
     code: 'EM',
-    context: 'Public-sector information system',
-    summary: 'Pengembangan dan integrasi sistem informasi.',
-    detail: 'Pengembangan aplikasi, integrasi layanan, pengelolaan data, dan analisis kendala.',
+    context: 'Sistem informasi publik',
+    detail: 'Mengembangkan aplikasi informasi, menghubungkan layanan dan data, serta membantu menyelesaikan kendala teknis.',
     categories: ['backend', 'data'],
     technologies: ['Java', 'Integration', 'Database'],
     contributions: [
-      'Mendukung proses pengembangan aplikasi.',
-      'Mendukung pengelolaan data dan integrasi layanan.',
-      'Menganalisis kendala teknis pada aplikasi.',
+      'Membantu mengembangkan aplikasi.',
+      'Mengelola data dan menghubungkan layanan.',
+      'Mencari penyebab kendala teknis.',
     ],
-    tone: 'rose',
   },
 ]
 
 const experiences = [
   {
-    period: 'Mar 2026 - Agu 2026',
+    period: 'Maret 2026 - Agustus 2026',
     company: 'TOGI Indonesia',
-    role: 'Java Engineer - penempatan DCI Indonesia Tbk',
-    summary: 'Pengembangan, integrasi, dan operasional aplikasi di lingkungan data center.',
+    role: 'Java Engineer (penempatan di DCI Indonesia Tbk)',
+    summary: 'Mengembangkan dan mengintegrasikan aplikasi untuk operasional data center.',
   },
   {
-    period: 'Okt 2025 - Feb 2026',
+    period: 'Oktober 2025 - Februari 2026',
     company: 'PT FAN 360',
-    role: 'Java Engineer - Indomarco',
-    summary: 'REST API Spring Boot, PostgreSQL, Oracle, dan pengujian layanan pemesanan.',
+    role: 'Java Engineer (penempatan di Indomarco)',
+    summary: 'Membangun REST API dengan Spring Boot, mengelola PostgreSQL dan Oracle, serta menguji layanan pemesanan.',
   },
   {
-    period: 'Okt 2023 - Jul 2025',
+    period: 'Oktober 2023 - Juli 2025',
     company: 'Mitra Utama Solusi Teknologi',
     role: 'Java Engineer',
-    summary: 'API, scheduler, GitLab CI/CD, serta dukungan UI untuk lima proyek enterprise.',
+    summary: 'Mengembangkan API, tugas terjadwal, dan CI/CD, serta mendukung pengembangan antarmuka untuk lima proyek.',
   },
   {
-    period: 'Okt 2022 - Okt 2023',
+    period: 'Oktober 2022 - Oktober 2023',
     company: 'Mega Giga Solusindo',
     role: 'Java Engineer',
-    summary: 'REST API, scheduler, database, testing, dan delivery tiga proyek.',
+    summary: 'Membangun API dan tugas terjadwal, mengelola database, serta menguji dan merilis aplikasi di tiga proyek.',
   },
   {
-    period: 'Okt 2021 - Apr 2022',
+    period: 'Oktober 2021 - April 2022',
     company: 'Juke Solusi Teknologi',
     role: 'Middleware & Database Engineer',
-    summary: 'REST API TIBCO, Docker, OpenShift, dan monitoring layanan GCP.',
+    summary: 'Mengembangkan REST API dengan TIBCO, menggunakan Docker dan OpenShift, serta memantau layanan di GCP.',
   },
 ]
 
@@ -190,7 +170,7 @@ const filters: { value: 'all' | ProjectCategory; label: string }[] = [
   { value: 'all', label: 'Semua' },
   { value: 'backend', label: 'Backend' },
   { value: 'data', label: 'Data' },
-  { value: 'delivery', label: 'Delivery' },
+  { value: 'delivery', label: 'Rilis' },
 ]
 
 const activeFilter = ref<'all' | ProjectCategory>('all')
@@ -198,7 +178,7 @@ const activeProject = ref<Project | null>(null)
 const activeSection = ref('home')
 const isMenuOpen = ref(false)
 const theme = ref<Theme>('light')
-const copyLabel = ref('Salin email')
+const copyLabel = ref('Salin alamat email')
 const projectViewport = ref<HTMLElement | null>(null)
 const currentYear = new Date().getFullYear()
 const contactForm = reactive({ name: '', subject: '', message: '' })
@@ -227,29 +207,30 @@ function scrollProjects(direction: 1 | -1) {
   const viewport = projectViewport.value
   if (!viewport) return
 
-  viewport.scrollBy({ left: viewport.clientWidth * 0.78 * direction, behavior: 'smooth' })
-}
+  const cards = [...viewport.querySelectorAll<HTMLElement>('.project-card')]
+  if (cards.length === 0) return
 
-function updateCardTilt(event: PointerEvent) {
-  if (
-    event.pointerType === 'touch' ||
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
-    return
+  const viewportCenter = viewport.getBoundingClientRect().left + viewport.clientWidth / 2
+  let currentIndex = 0
+  let nearestDistance = Number.POSITIVE_INFINITY
 
-  const card = event.currentTarget as HTMLElement
-  const bounds = card.getBoundingClientRect()
-  const x = (event.clientX - bounds.left) / bounds.width - 0.5
-  const y = (event.clientY - bounds.top) / bounds.height - 0.5
+  cards.forEach((card, index) => {
+    const cardCenter = card.getBoundingClientRect().left + card.offsetWidth / 2
+    const distance = Math.abs(cardCenter - viewportCenter)
 
-  card.style.setProperty('--tilt-x', `${(-y * 8).toFixed(2)}deg`)
-  card.style.setProperty('--tilt-y', `${(x * 11).toFixed(2)}deg`)
-}
+    if (distance < nearestDistance) {
+      currentIndex = index
+      nearestDistance = distance
+    }
+  })
 
-function resetCardTilt(event: PointerEvent) {
-  const card = event.currentTarget as HTMLElement
-  card.style.setProperty('--tilt-x', '0deg')
-  card.style.setProperty('--tilt-y', '0deg')
+  const nextIndex = Math.max(0, Math.min(cards.length - 1, currentIndex + direction))
+  const targetCard = cards[nextIndex]
+  if (!targetCard) return
+
+  const targetCenter = targetCard.getBoundingClientRect().left + targetCard.offsetWidth / 2
+
+  viewport.scrollBy({ left: targetCenter - viewportCenter, behavior: 'smooth' })
 }
 
 function openProject(project: Project) {
@@ -271,7 +252,7 @@ async function copyEmail() {
 
   window.clearTimeout(copyTimer)
   copyTimer = window.setTimeout(() => {
-    copyLabel.value = 'Salin email'
+    copyLabel.value = 'Salin alamat email'
   }, 2400)
 }
 
@@ -368,9 +349,9 @@ onBeforeUnmount(() => {
     <header class="site-header">
       <div class="shell nav-shell">
         <a class="brand" href="#home" aria-label="Beranda Prakosa Dwi Prasetya">
-          <span class="brand-mark">PD</span>
+          <PrakosaLogo class="brand-logo" />
           <span class="brand-copy">
-            <strong>Prakosa Dwi</strong>
+            <strong>Prakosa Dwi Prasetya</strong>
             <small>Java Engineer</small>
           </span>
         </a>
@@ -404,7 +385,7 @@ onBeforeUnmount(() => {
               />
             </svg>
           </button>
-          <a class="button button-small button-dark desktop-cta" href="#contact">Mari bicara</a>
+          <a class="button button-small button-dark desktop-cta" href="#contact">Hubungi saya</a>
           <button
             class="icon-button menu-button"
             type="button"
@@ -426,52 +407,78 @@ onBeforeUnmount(() => {
         <div class="shell hero-grid">
           <div class="hero-copy" data-reveal>
             <p class="availability"><span></span> Java Engineer dari Bekasi, Indonesia</p>
-            <h1>
-              Backend Java yang
-              <span class="accent-line">andal dan siap berkembang.</span>
-            </h1>
+            <h1>Software Engineer</h1>
             <p class="hero-lead">
-              Saya Prakosa. Saya membangun API, integrasi data, dan pipeline deployment untuk
-              aplikasi enterprise.
+              Saya Prakosa, Java Engineer dari Bekasi. Saya membangun API, menghubungkan data, dan
+              menyiapkan aplikasi untuk dirilis.
             </p>
 
             <div class="hero-actions">
               <a class="button button-primary" href="#projects"
-                >Lihat proyek <span aria-hidden="true">-&gt;</span></a
+                >Lihat proyek saya <span aria-hidden="true">-&gt;</span></a
               >
               <a class="text-link" href="#experience"
-                >Telusuri perjalanan <span aria-hidden="true">&darr;</span></a
+                >Kenali perjalanan saya <span aria-hidden="true">&darr;</span></a
               >
-            </div>
-
-            <div class="hero-proof" aria-label="Ringkasan pengalaman">
-              <div><strong>4+</strong><span>Tahun pengalaman</span></div>
-              <div><strong>8</strong><span>Proyek utama</span></div>
-              <div><strong>5</strong><span>Perusahaan teknologi</span></div>
             </div>
           </div>
 
           <div class="hero-visual" data-reveal>
-            <div class="profile-illustration">
-              <div class="visual-grid" aria-hidden="true"></div>
-              <div class="profile-topline"><span>PROFILE / 01</span><span>BEKASI</span></div>
-              <div class="profile-monogram" aria-label="Inisial Prakosa Dwi Prasetya">PDP</div>
-              <div class="profile-role">
-                <span>Java Engineer</span>
-                <small>Backend - Data - Delivery</small>
+            <div class="system-map" role="group" aria-labelledby="system-map-title">
+              <div class="system-map-header">
+                <span class="map-kicker"><i></i> ALUR KERJA</span>
+                <span class="map-index">01 / 03</span>
               </div>
-              <div class="code-card" aria-label="Teknologi utama">
-                <div class="code-card-head">
-                  <span></span><span></span><span></span><b>stack.json</b>
+
+              <div class="system-map-heading">
+                <p>PENGEMBANGAN JAVA</p>
+                <h2 id="system-map-title">Dari kebutuhan<br /><span>sampai siap rilis.</span></h2>
+                <span class="map-caption">Membangun layanan yang mudah digunakan dan dirawat.</span>
+              </div>
+
+              <div class="system-flow" role="list" aria-label="Alur dari layanan API hingga deployment">
+                <div class="system-node" role="listitem">
+                  <span class="node-icon">API</span>
+                  <div class="node-copy">
+                    <span class="node-label">01 / LAYANAN</span>
+                    <strong>Layanan API</strong>
+                    <small>Spring Boot / Quarkus</small>
+                  </div>
+                  <span class="node-status" aria-hidden="true"></span>
                 </div>
-                <code
-                  >{<br />&nbsp; "core": "Spring Boot",<br />&nbsp; "data": ["PostgreSQL",
-                  "Oracle"],<br />&nbsp; "ship": "GitLab CI/CD"<br />}</code
-                >
+                <span class="flow-connector" aria-hidden="true"><i></i></span>
+                <div class="system-node" role="listitem">
+                  <span class="node-icon node-icon-data">DB</span>
+                  <div class="node-copy">
+                    <span class="node-label">02 / DATA</span>
+                    <strong>Penyimpanan data</strong>
+                    <small>PostgreSQL / Oracle</small>
+                  </div>
+                  <span class="node-status" aria-hidden="true"></span>
+                </div>
+                <span class="flow-connector" aria-hidden="true"><i></i></span>
+                <div class="system-node" role="listitem">
+                  <span class="node-icon node-icon-delivery">CI</span>
+                  <div class="node-copy">
+                    <span class="node-label">03 / RILIS</span>
+                    <strong>Proses rilis aplikasi</strong>
+                    <small>GitLab CI/CD / Docker</small>
+                  </div>
+                  <span class="node-status" aria-hidden="true"></span>
+                </div>
+              </div>
+
+              <div class="system-map-footer">
+                <span><i></i> BEKASI, INDONESIA</span>
+                <span>BACKEND <b>/</b> DATA <b>/</b> RILIS</span>
               </div>
             </div>
-            <div class="visual-badge badge-one"><span>01</span> API Engineering</div>
-            <div class="visual-badge badge-two"><span>02</span> Reliable delivery</div>
+          </div>
+
+          <div class="hero-proof" aria-label="Ringkasan pengalaman">
+            <div><strong>4+</strong><span>Tahun pengalaman</span></div>
+            <div><strong>8</strong><span>Proyek utama</span></div>
+            <div><strong>5</strong><span>Perusahaan teknologi</span></div>
           </div>
         </div>
       </section>
@@ -488,19 +495,25 @@ onBeforeUnmount(() => {
         <div class="shell about-grid">
           <div class="section-intro" data-reveal>
             <p class="eyebrow">01 / Tentang</p>
-            <h2>Berpikir dari alur bisnis, membangun sampai production.</h2>
+            <h2>Bersedia melayani Anda.</h2>
           </div>
 
           <div class="about-copy" data-reveal>
             <p class="about-lead">
-              Saya membangun layanan yang rapi, mudah ditelusuri, dan siap dikirim.
+              Saya membangun layanan yang terstruktur, mudah dipahami, dan siap dirilis.
             </p>
             <div class="about-columns">
-              <p>Spring Boot, Quarkus, dan TIBCO untuk API; PostgreSQL dan Oracle untuk data.</p>
-              <p>GitLab CI/CD, Docker, OpenShift, dan Postman untuk testing hingga delivery.</p>
+              <p>
+                Saya memakai Spring Boot, Quarkus, dan TIBCO untuk membangun API; PostgreSQL dan
+                Oracle untuk mengelola data.
+              </p>
+              <p>
+                Untuk menguji dan merilis aplikasi, saya menggunakan Postman, GitLab CI/CD, Docker,
+                dan OpenShift.
+              </p>
             </div>
             <a class="inline-link" href="#contact"
-              >Diskusikan kebutuhan teknis <span aria-hidden="true">-&gt;</span></a
+              >Ceritakan kebutuhan Anda <span aria-hidden="true">-&gt;</span></a
             >
           </div>
         </div>
@@ -511,29 +524,26 @@ onBeforeUnmount(() => {
           <div class="section-heading" data-reveal>
             <div>
               <p class="eyebrow">02 / Keahlian</p>
-              <h2>Dari kode sampai production.</h2>
+              <h2>Teknologi dan tools yang saya gunakan.</h2>
             </div>
-            <p>Empat area kerja utama.</p>
           </div>
 
-          <div class="capability-grid">
-            <article
-              v-for="capability in capabilities"
-              :key="capability.number"
-              class="capability-card"
-              data-reveal
-            >
-              <div class="capability-top">
-                <span>{{ capability.number }}</span
-                ><i></i>
-              </div>
-              <h3>{{ capability.title }}</h3>
-              <p>{{ capability.description }}</p>
-              <ul>
-                <li v-for="tag in capability.tags" :key="tag">{{ tag }}</li>
-              </ul>
-            </article>
-          </div>
+          <ul class="tools-list" data-reveal aria-label="Teknologi dan tools yang saya gunakan">
+            <li v-for="tool in tools" :key="tool.name">
+              <span class="tool-logo" :style="{ '--tool-color': `#${tool.color}` }">
+                <PrakosaLogo v-if="tool.customLogo" class="tool-custom-logo" />
+                <img
+                  v-else-if="tool.slug && !brokenToolLogos.includes(tool.name)"
+                  :src="`https://cdn.simpleicons.org/${tool.slug}/${tool.color}`"
+                  :alt="`Logo ${tool.name}`"
+                  loading="lazy"
+                  @error="markToolLogoBroken(tool.name)"
+                />
+                <span v-else class="tool-logo-fallback" aria-hidden="true">{{ tool.mark }}</span>
+              </span>
+              <span class="tool-name">{{ tool.name }}</span>
+            </li>
+          </ul>
         </div>
       </section>
 
@@ -541,10 +551,10 @@ onBeforeUnmount(() => {
         <div class="shell">
           <div class="section-heading projects-heading" data-reveal>
             <div>
-              <p class="eyebrow">03 / Selected work</p>
-              <h2>Proyek pilihan.</h2>
+              <p class="eyebrow">03 / Proyek</p>
+              <h2>Project</h2>
             </div>
-            <p>Geser kartu atau gunakan tombol navigasi.</p>
+            <p>Geser untuk melihat proyek lain, atau gunakan tombol panah.</p>
           </div>
 
           <div class="project-filters" data-reveal aria-label="Filter proyek">
@@ -567,7 +577,7 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="carousel-actions" data-reveal>
-            <p><span></span> Drag / scroll</p>
+            <p><span></span> Geser untuk melihat proyek lain</p>
             <div>
               <button type="button" aria-label="Proyek sebelumnya" @click="scrollProjects(-1)">
                 &larr;
@@ -589,51 +599,35 @@ onBeforeUnmount(() => {
                 v-for="project in filteredProjects"
                 :key="project.id"
                 class="project-card"
-                @pointermove="updateCardTilt"
-                @pointerleave="resetCardTilt"
               >
-                <button
-                  type="button"
-                  class="project-card-button"
-                  :aria-label="`Lihat detail proyek ${project.name}`"
-                  @click="openProject(project)"
-                >
-                  <div :class="['project-art', `tone-${project.tone}`]">
-                    <div class="project-browser">
-                      <div class="browser-head">
-                        <span></span><span></span><span></span><b>/api/{{ project.id }}</b>
-                      </div>
-                      <div class="browser-body">
-                        <div class="browser-sidebar"></div>
-                        <div class="browser-content">
-                          <i></i><i></i><i></i>
-                          <div><span></span><span></span><span></span></div>
-                        </div>
-                      </div>
-                    </div>
-                    <strong>{{ project.code }}</strong>
+                <div class="project-card-copy">
+                  <div class="project-context">
+                    <span>{{ project.context }}</span
+                    ><span>{{ project.code }}</span>
                   </div>
-                  <div class="project-card-copy">
-                    <div class="project-context">
-                      <span>{{ project.context }}</span
-                      ><span aria-hidden="true">&nearr;</span>
-                    </div>
-                    <h3>{{ project.name }}</h3>
-                    <p>{{ project.summary }}</p>
-                    <ul>
-                      <li v-for="technology in project.technologies.slice(0, 3)" :key="technology">
-                        {{ technology }}
-                      </li>
-                    </ul>
-                  </div>
-                </button>
+                  <h3>{{ project.name }}</h3>
+                  <p>{{ project.detail }}</p>
+                  <ul>
+                    <li v-for="technology in project.technologies.slice(0, 3)" :key="technology">
+                      {{ technology }}
+                    </li>
+                  </ul>
+                  <button
+                    type="button"
+                    class="project-detail-button"
+                    :aria-label="`Lihat detail proyek ${project.name}`"
+                    @click="openProject(project)"
+                  >
+                    <span>Lihat detail</span><span aria-hidden="true">&nearr;</span>
+                  </button>
+                </div>
               </article>
             </TransitionGroup>
           </div>
 
           <p class="more-projects" data-reveal>
-            Pengalaman lain mencakup <strong>IWOOD, AP1, REC, SEMAR, SAKTI,</strong> dan
-            <strong>EV2GO</strong>.
+            Saya juga pernah terlibat dalam proyek <strong>IWOOD, AP1, REC, SEMAR, SAKTI,</strong>
+            dan <strong>EV2GO</strong>.
           </p>
         </div>
       </section>
@@ -642,13 +636,13 @@ onBeforeUnmount(() => {
         <div class="shell experience-layout">
           <div class="experience-sticky" data-reveal>
             <p class="eyebrow">04 / Perjalanan</p>
-            <h2>Empat tahun membangun sistem.</h2>
-            <p>Backend, middleware, database, dan deployment dalam satu alur kerja.</p>
+            <h2>Perjalanan karier saya.</h2>
+            <p>Saya mengembangkan backend dan middleware, mengelola database, serta membantu merilis aplikasi.</p>
 
             <div class="education-card">
               <small>Pendidikan</small>
               <strong>S1 Teknik Informatika</strong>
-              <span>Universitas YARSI - IPK 3,47</span>
+                <span>Universitas YARSI, IPK 3,47</span>
               <span>2017 - 2021</span>
             </div>
           </div>
@@ -674,7 +668,7 @@ onBeforeUnmount(() => {
           <div class="contact-copy">
             <p class="eyebrow">05 / Kontak</p>
             <h2>Mari bangun sistem yang lebih baik.</h2>
-            <p>Ceritakan kebutuhan Java, integrasi, atau database Anda.</p>
+            <p>Ada kebutuhan Java, integrasi, atau database? Ceritakan kepada saya.</p>
 
             <div class="contact-links">
               <a :href="`mailto:${email}`"
@@ -684,7 +678,7 @@ onBeforeUnmount(() => {
                 ><small>LinkedIn</small><strong>/in/prakosa-dwi-prasetya &nearr;</strong></a
               >
               <button type="button" @click="copyEmail">
-                <small>Quick action</small><strong>{{ copyLabel }}</strong>
+                <small>Kontak cepat</small><strong>{{ copyLabel }}</strong>
               </button>
             </div>
           </div>
@@ -697,7 +691,7 @@ onBeforeUnmount(() => {
                 type="text"
                 name="name"
                 autocomplete="name"
-                placeholder="Nama kamu"
+                placeholder="Nama Anda"
                 required
               />
             </label>
@@ -717,14 +711,14 @@ onBeforeUnmount(() => {
                 v-model="contactForm.message"
                 name="message"
                 rows="5"
-                placeholder="Ceritakan kebutuhan singkatnya..."
+                placeholder="Tuliskan pesan atau kebutuhan Anda."
                 required
               ></textarea>
             </label>
             <button class="button button-primary form-submit" type="submit">
-              Buka di email <span aria-hidden="true">-&gt;</span>
+              Lanjutkan lewat email <span aria-hidden="true">-&gt;</span>
             </button>
-            <small>Membuka aplikasi email. Tidak ada data yang disimpan.</small>
+            <small>Form ini akan membuka aplikasi email Anda. Pesan tidak dikirim otomatis.</small>
           </form>
         </div>
       </section>
@@ -733,7 +727,7 @@ onBeforeUnmount(() => {
     <footer class="site-footer">
       <div class="shell footer-inner">
         <p>&copy; {{ currentYear }} Prakosa Dwi Prasetya</p>
-        <p>Dibangun dengan Vue - dirancang untuk tetap sederhana.</p>
+        <p>Website ini dibuat dengan Vue.</p>
         <a href="#home">Kembali ke atas &uarr;</a>
       </div>
     </footer>
@@ -759,11 +753,11 @@ onBeforeUnmount(() => {
           >
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
           </button>
-          <p class="eyebrow">Project detail</p>
+          <p class="eyebrow">Tentang proyek</p>
           <h2 :id="`modal-${activeProject.id}`">{{ activeProject.name }}</h2>
           <p class="modal-context">{{ activeProject.context }}</p>
           <p class="modal-description">{{ activeProject.detail }}</p>
-          <h3>Kontribusi utama</h3>
+          <h3>Yang saya kerjakan</h3>
           <ul class="contribution-list">
             <li v-for="contribution in activeProject.contributions" :key="contribution">
               {{ contribution }}
@@ -775,7 +769,7 @@ onBeforeUnmount(() => {
             </li>
           </ul>
           <a class="button button-dark" href="#contact" @click="closeProject"
-            >Diskusikan proyek serupa <span aria-hidden="true">-&gt;</span></a
+            >Ceritakan proyek serupa <span aria-hidden="true">-&gt;</span></a
           >
         </section>
       </div>

@@ -1,0 +1,19 @@
+<template>
+  <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <rect x="2" y="2" width="60" height="60" rx="19" fill="#0B2441" />
+    <rect x="2.5" y="2.5" width="59" height="59" rx="18.5" stroke="#7DD3FC" stroke-opacity=".46" />
+    <path d="M15 48.5h34" stroke="#38BDF8" stroke-linecap="round" stroke-width="2.5" />
+    <text
+      x="32"
+      y="38"
+      fill="#F8FBFF"
+      font-family="Arial, sans-serif"
+      font-size="17"
+      font-weight="800"
+      letter-spacing="-1.2"
+      text-anchor="middle"
+    >
+      PDP
+    </text>
+  </svg>
+</template>
