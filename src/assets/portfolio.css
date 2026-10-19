@@ -1,42 +1,42 @@
 :root {
-  --paper: #f3f7fc;
-  --paper-strong: #ffffff;
-  --paper-soft: #eaf1f9;
-  --ink: #10233d;
-  --ink-soft: #344b67;
-  --muted: #61758d;
-  --line: #d6e1ef;
-  --blue: #2563eb;
-  --blue-dark: #1748ad;
+  --paper: #f7f7f3;
+  --paper-strong: #fffefa;
+  --paper-soft: #edf1ee;
+  --ink: #192b3d;
+  --ink-soft: #3b5265;
+  --muted: #657787;
+  --line: #dce4e2;
+  --blue: #3972d5;
+  --blue-dark: #2456a6;
   --button-ink: #ffffff;
   --button-hover: #1d4ed8;
-  --cyan: #38bdf8;
-  --lime: #7dd3fc;
+  --cyan: #83d1e7;
+  --lime: #b9e3d4;
   --navy: #081a33;
   --navy-soft: #10294b;
   --shadow-sm: 0 12px 32px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 28px 80px rgba(0, 0, 0, 0.18);
-  --radius-sm: 14px;
-  --radius-md: 22px;
-  --radius-lg: 34px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
   --shell: 1180px;
   --header-height: 82px;
 }
 
 :root[data-theme='dark'] {
-  --paper: #07111f;
-  --paper-strong: #0d1b2e;
-  --paper-soft: #11243b;
+  --paper: #101a25;
+  --paper-strong: #162331;
+  --paper-soft: #1a2a38;
   --ink: #ffffff;
   --ink-soft: #c8d8ec;
   --muted: #94a9c2;
-  --line: #263a54;
-  --blue: #60a5fa;
-  --blue-dark: #93c5fd;
+  --line: #304453;
+  --blue: #70a1f0;
+  --blue-dark: #a4c5ff;
   --button-ink: #081a33;
   --button-hover: #7dd3fc;
-  --cyan: #38bdf8;
-  --lime: #7dd3fc;
+  --cyan: #83d1e7;
+  --lime: #b9e3d4;
   --navy: #061326;
   --navy-soft: #10294b;
   --shadow-sm: 0 14px 36px rgba(0, 0, 0, 0.2);
@@ -60,7 +60,7 @@ body {
   overflow-x: hidden;
   color: var(--ink);
   background: var(--paper);
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: 'Nunito Sans', system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.6;
   text-rendering: optimizeLegibility;
@@ -142,10 +142,9 @@ ol {
 .eyebrow {
   margin-bottom: 17px;
   color: var(--blue-dark);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.11em;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -181,7 +180,7 @@ ol {
   gap: 12px;
   padding: 0 22px;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 14px;
   font-size: 0.9rem;
   font-weight: 800;
   transition:
@@ -361,6 +360,33 @@ ol {
   gap: 9px;
 }
 
+.language-toggle {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  color: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(147, 197, 253, 0.25);
+  border-radius: 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.language-toggle:hover {
+  border-color: var(--cyan);
+}
+
+.language-toggle span.active {
+  color: #ffffff;
+}
+
 .icon-button {
   display: grid;
   width: 42px;
@@ -494,7 +520,7 @@ ol {
   padding: 17px 22px;
   background: var(--paper-strong);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -526,7 +552,7 @@ ol {
     linear-gradient(145deg, #123a70, #081a33 72%);
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(147, 197, 253, 0.2);
-  border-radius: 28px;
+  border-radius: 18px;
 }
 
 .system-map::before {
@@ -837,7 +863,7 @@ ol {
   color: var(--ink);
   background: var(--paper-strong);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 12px;
   font-size: 0.88rem;
   font-weight: 800;
   text-align: center;
@@ -848,6 +874,23 @@ ol {
     transform 0.2s ease;
 }
 
+.tools-list.is-visible li {
+  animation: tool-tile-in 0.55s cubic-bezier(0.2, 0.75, 0.3, 1) backwards;
+  animation-delay: calc(var(--item-index, 0) * 45ms);
+}
+
+@keyframes tool-tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .tool-logo {
   display: grid;
   width: 54px;
@@ -856,7 +899,7 @@ ol {
   color: var(--tool-color);
   background: #f7faff;
   border: 1px solid #e4edf8;
-  border-radius: 16px;
+  border-radius: 12px;
   place-items: center;
 }
 
@@ -905,7 +948,7 @@ ol {
   color: var(--ink-soft);
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 8px;
   font-size: 0.67rem;
   font-weight: 700;
 }
@@ -940,7 +983,7 @@ ol {
   color: rgba(255, 255, 255, 0.86);
   background: #0c2341;
   border: 1px solid rgba(147, 197, 253, 0.2);
-  border-radius: 999px;
+  border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 700;
   transition:
@@ -1061,9 +1104,9 @@ ol {
 .project-card {
   min-width: 0;
   overflow: hidden;
-  background: linear-gradient(155deg, #12345c, #0c2341 72%);
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: var(--radius-md);
+  background: linear-gradient(145deg, var(--paper-strong), var(--paper-soft));
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: var(--radius-lg);
   scroll-snap-align: center;
   transition:
     border-color 0.25s ease,
@@ -1072,9 +1115,9 @@ ol {
 }
 
 .project-card:hover {
-  border-color: rgba(125, 211, 252, 0.62);
-  box-shadow: 0 30px 55px rgba(0, 0, 0, 0.36);
-  transform: translateY(-4px);
+  border-color: var(--cyan);
+  box-shadow: 0 28px 55px rgba(0, 0, 0, 0.24);
+  transform: translateY(-6px);
 }
 
 .project-card:focus-within {
@@ -1084,42 +1127,44 @@ ol {
 
 .project-card-copy {
   display: flex;
-  min-height: 330px;
+  min-height: 370px;
   flex-direction: column;
-  padding: clamp(24px, 3vw, 34px);
+  padding: clamp(28px, 3.4vw, 42px);
 }
 
 .project-context {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  color: rgba(255, 255, 255, 0.54);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .project-context span:last-child {
   padding: 4px 8px;
-  color: #a5d9ff;
-  background: rgba(96, 165, 250, 0.13);
-  border-radius: 999px;
+  color: var(--blue-dark);
+  background: rgba(57, 114, 213, 0.1);
+  border-radius: 8px;
   font-size: 0.57rem;
   font-weight: 600;
 }
 
 .project-card-copy h3 {
-  margin-bottom: 12px;
-  font-size: 1.35rem;
+  margin-bottom: 16px;
+  color: var(--ink);
+  font-size: 1.55rem;
   letter-spacing: -0.035em;
 }
 
 .project-card-copy > p {
   flex: 1;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.86rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.75;
 }
 
 .project-detail-button {
@@ -1128,11 +1173,11 @@ ol {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 22px;
-  padding-top: 15px;
-  color: #a5d9ff;
+  margin-top: 26px;
+  padding-top: 18px;
+  color: var(--blue-dark);
   background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid var(--line);
   text-align: left;
   font-size: 0.76rem;
   font-weight: 700;
@@ -1148,9 +1193,9 @@ ol {
 }
 
 .project-card-copy li {
-  color: rgba(255, 255, 255, 0.68);
-  background: rgba(255, 255, 255, 0.055);
-  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ink-soft);
+  background: rgba(57, 114, 213, 0.07);
+  border-color: rgba(57, 114, 213, 0.14);
 }
 
 .more-projects {
@@ -1350,8 +1395,8 @@ ol {
   max-width: 640px;
   margin-bottom: 22px;
   font-size: clamp(2.1rem, 4.5vw, 3.65rem);
-  line-height: 1;
-  letter-spacing: -0.06em;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
 }
 
 .contact-copy > p:not(.eyebrow) {
@@ -1591,7 +1636,7 @@ ol {
     background: var(--paper-strong);
     border: 1px solid var(--line);
     box-shadow: var(--shadow-lg);
-    border-radius: 18px;
+    border-radius: 14px;
   }
 
   .nav-links.is-open {
@@ -1718,7 +1763,7 @@ ol {
 
   .contact-panel {
     width: min(calc(100% - 24px), var(--shell));
-    border-radius: 26px;
+    border-radius: 20px;
   }
 
   .footer-inner {
@@ -1810,7 +1855,7 @@ ol {
 
   .system-map {
     padding: 22px 18px;
-    border-radius: 23px;
+    border-radius: 16px;
   }
 
   .system-map-heading h2 {
@@ -1861,8 +1906,8 @@ ol {
   }
 
   .project-card-copy {
-    padding: 23px;
-    min-height: 300px;
+    min-height: 350px;
+    padding: 26px;
   }
 
   .experience-list li {
@@ -1916,5 +1961,9 @@ ol {
   .project-card,
   .project-card:hover {
     transform: none !important;
+  }
+
+  .tools-list.is-visible li {
+    animation-delay: 0s;
   }
 }
