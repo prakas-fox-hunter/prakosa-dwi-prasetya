@@ -20,6 +20,8 @@ type Project = {
 const email = 'prakosadwiprasetya@gmail.com'
 const phone = '+62 895 1947 6506'
 const linkedinUrl = 'https://www.linkedin.com/in/prakosa-dwi-prasetya/'
+const cvFilename = 'CV Prakosa Dwi Prasetya English - 4_1.pdf'
+const cvUrl = `${import.meta.env.BASE_URL}${encodeURIComponent(cvFilename)}`
 
 const locale = ref<Locale>('id')
 const translations = {
@@ -35,6 +37,7 @@ const translations = {
     themeDark: 'Aktifkan tema gelap',
     themeLight: 'Aktifkan tema terang',
     contactMe: 'Hubungi saya',
+    downloadCv: 'Unduh CV',
     openNav: 'Buka navigasi',
     closeNav: 'Tutup navigasi',
     availability: 'Java Engineer dari Bekasi, Indonesia',
@@ -58,25 +61,24 @@ const translations = {
     yearsExperience: 'Tahun pengalaman',
     keyProjects: 'Proyek utama',
     techCompanies: 'Perusahaan teknologi',
-    toolbeltAria: 'Tools development',
     aboutEyebrow: '01 / Tentang',
-    aboutHeading: 'Bersedia melayani Anda.',
+    aboutHeading: 'Bersedia Melayani Anda.',
     aboutLead: 'Saya membangun layanan yang terstruktur, mudah dipahami, dan siap dirilis.',
+    aboutAvailability: 'Saya dapat bekerja secara kontrak maupun berbasis proyek.',
     aboutData:
       'Saya memakai Spring Boot, Quarkus, dan TIBCO untuk membangun API; PostgreSQL, Oracle Database, dan MariaDB untuk mengelola data.',
     aboutDelivery:
       'Untuk menguji dan merilis aplikasi, saya menggunakan Postman, GitLab CI/CD, Docker, dan OpenShift.',
     tellMe: 'Ceritakan kebutuhan Anda',
-    expertiseEyebrow: '02 / Keahlian',
-    toolsTitle: 'Tools development',
+    expertiseEyebrow: '04 / Keahlian',
+    toolsTitle: 'Tools Development',
     toolsAria: 'Tools development',
     logo: 'Logo',
     projectsEyebrow: '03 / Proyek',
-    projectsTitle: 'Proyek pilihan',
-    projectHint: 'Geser untuk melihat proyek lain, atau gunakan tombol panah.',
+    projectsTitle: 'Project Experience',
+    projectHint: 'Pilih proyek untuk melihat detailnya.',
     projectFilters: { all: 'Semua', backend: 'Backend', data: 'Data', delivery: 'Rilis' },
     filterAria: 'Filter proyek',
-    carouselHint: 'Geser untuk melihat proyek lain',
     previousProject: 'Proyek sebelumnya',
     nextProject: 'Proyek berikutnya',
     projectCarousel: 'Carousel proyek',
@@ -84,15 +86,15 @@ const translations = {
     seeDetails: 'Lihat detail',
     moreProjectsStart: 'Saya juga pernah terlibat dalam proyek',
     moreProjectsEnd: 'dan',
-    experienceEyebrow: '04 / Perjalanan',
-    experienceTitle: 'Perjalanan karier saya.',
+    experienceEyebrow: '02 / Perjalanan',
+    experienceTitle: 'Perjalanan Karier Saya.',
     experienceIntro:
       'Saya mengembangkan backend dan middleware, mengelola database, serta membantu merilis aplikasi.',
     education: 'Pendidikan',
     degree: 'S1 Teknik Informatika',
     university: 'Universitas YARSI, IPK 3,47',
     contactEyebrow: '05 / Kontak',
-    contactTitle: 'Punya ide? Mari kita obrolkan.',
+    contactTitle: 'Punya Ide? Mari Berdiskusi.',
     contactIntro: 'Ada kebutuhan Java, integrasi, atau database? Ceritakan kepada saya.',
     email: 'Email',
     phone: 'Telepon',
@@ -112,7 +114,6 @@ const translations = {
     emailGreeting: 'Halo Prakosa Dwi Prasetya,',
     emailSignoff: 'Salam,',
     backToTop: 'Kembali ke atas',
-    siteMadeWith: 'Website ini dibuat dengan Vue.',
     aboutProject: 'Tentang proyek',
     closeProject: 'Tutup detail proyek',
     yourContribution: 'Yang saya kerjakan',
@@ -130,6 +131,7 @@ const translations = {
     themeDark: 'Enable dark theme',
     themeLight: 'Enable light theme',
     contactMe: 'Get in touch',
+    downloadCv: 'Download CV',
     openNav: 'Open navigation',
     closeNav: 'Close navigation',
     availability: 'Java Engineer based in Bekasi, Indonesia',
@@ -153,25 +155,24 @@ const translations = {
     yearsExperience: 'Years of experience',
     keyProjects: 'Key projects',
     techCompanies: 'Technology companies',
-    toolbeltAria: 'Development tools',
     aboutEyebrow: '01 / About',
-    aboutHeading: 'Here to help you build.',
+    aboutHeading: 'Here To Help You Build.',
     aboutLead: 'I build well-structured services that are easy to understand and ready to ship.',
+    aboutAvailability: 'I’m available for contract and project-based work.',
     aboutData:
       'I use Spring Boot, Quarkus, and TIBCO to build APIs, and PostgreSQL, Oracle Database, and MariaDB to manage data.',
     aboutDelivery:
       'I test and release applications with Postman, GitLab CI/CD, Docker, and OpenShift.',
     tellMe: 'Tell me what you need',
-    expertiseEyebrow: '02 / Tools',
-    toolsTitle: 'Development tools',
+    expertiseEyebrow: '04 / Tools',
+    toolsTitle: 'Development Tools',
     toolsAria: 'Development tools',
     logo: 'Logo',
     projectsEyebrow: '03 / Projects',
-    projectsTitle: 'Selected projects',
-    projectHint: 'Swipe to explore projects, or use the arrow buttons.',
+    projectsTitle: 'Project Experience',
+    projectHint: 'Select a project to view its details.',
     projectFilters: { all: 'All', backend: 'Backend', data: 'Data', delivery: 'Release' },
     filterAria: 'Project filters',
-    carouselHint: 'Swipe to explore projects',
     previousProject: 'Previous project',
     nextProject: 'Next project',
     projectCarousel: 'Project carousel',
@@ -179,15 +180,15 @@ const translations = {
     seeDetails: 'View details',
     moreProjectsStart: 'I’ve also contributed to',
     moreProjectsEnd: 'and',
-    experienceEyebrow: '04 / Experience',
-    experienceTitle: 'My career journey.',
+    experienceEyebrow: '02 / Experience',
+    experienceTitle: 'My Career Journey.',
     experienceIntro:
       'I build backend and middleware services, manage databases, and help ship applications.',
     education: 'Education',
     degree: 'BSc in Informatics Engineering',
     university: 'Universitas YARSI, GPA 3.47',
     contactEyebrow: '05 / Contact',
-    contactTitle: 'Have an idea? Let’s talk.',
+    contactTitle: 'Have An Idea? Let’s Talk.',
     contactIntro: 'Need help with Java, integrations, or databases? Tell me about it.',
     email: 'Email',
     phone: 'Phone',
@@ -207,7 +208,6 @@ const translations = {
     emailGreeting: 'Hello Prakosa Dwi Prasetya,',
     emailSignoff: 'Best,',
     backToTop: 'Back to top',
-    siteMadeWith: 'This website is built with Vue.',
     aboutProject: 'About this project',
     closeProject: 'Close project details',
     yourContribution: 'What I worked on',
@@ -219,9 +219,9 @@ const copy = computed(() => translations[locale.value])
 
 const navItems = [
   { id: 'about', key: 'about' },
-  { id: 'expertise', key: 'expertise' },
-  { id: 'projects', key: 'projects' },
   { id: 'experience', key: 'experience' },
+  { id: 'projects', key: 'projects' },
+  { id: 'expertise', key: 'expertise' },
 ] as const
 
 const tools: { name: string; slug: string; color: string; mark: string; customLogo?: boolean }[] = [
@@ -460,12 +460,12 @@ const filters: { value: 'all' | ProjectCategory }[] = [
 ]
 
 const activeFilter = ref<'all' | ProjectCategory>('all')
+const activeProjectIndex = ref(0)
 const activeProjectId = ref<string | null>(null)
 const activeSection = ref('home')
 const isMenuOpen = ref(false)
 const theme = ref<Theme>('light')
 const copyStatus = ref<'ready' | 'copied' | 'fallback'>('ready')
-const projectViewport = ref<HTMLElement | null>(null)
 const currentYear = new Date().getFullYear()
 const contactForm = reactive({ name: '', subject: '', message: '' })
 
@@ -491,6 +491,17 @@ const filteredProjects = computed(() => {
     project.categories.includes(activeFilter.value as ProjectCategory),
   )
 })
+
+const projectCardAngle = computed(() => 360 / Math.max(filteredProjects.value.length, 1))
+const projectTrackStyle = computed(() => ({
+  '--project-rotation': `${activeProjectIndex.value * projectCardAngle.value * -1}deg`,
+}))
+
+function projectCardStyle(index: number) {
+  return {
+    '--card-rotation': `${index * projectCardAngle.value}deg`,
+  }
+}
 
 const selectedProject = computed(
   () => localizedProjects.value.find((project) => project.id === activeProjectId.value) ?? null,
@@ -529,34 +540,12 @@ function toggleLocale() {
   localStorage.setItem('portfolio-locale', locale.value)
 }
 
-function scrollProjects(direction: 1 | -1) {
-  const viewport = projectViewport.value
-  if (!viewport) return
+function rotateProjects(direction: 1 | -1) {
+  const totalProjects = filteredProjects.value.length
+  if (totalProjects === 0) return
 
-  const cards = [...viewport.querySelectorAll<HTMLElement>('.project-card')]
-  if (cards.length === 0) return
-
-  const viewportCenter = viewport.getBoundingClientRect().left + viewport.clientWidth / 2
-  let currentIndex = 0
-  let nearestDistance = Number.POSITIVE_INFINITY
-
-  cards.forEach((card, index) => {
-    const cardCenter = card.getBoundingClientRect().left + card.offsetWidth / 2
-    const distance = Math.abs(cardCenter - viewportCenter)
-
-    if (distance < nearestDistance) {
-      currentIndex = index
-      nearestDistance = distance
-    }
-  })
-
-  const nextIndex = Math.max(0, Math.min(cards.length - 1, currentIndex + direction))
-  const targetCard = cards[nextIndex]
-  if (!targetCard) return
-
-  const targetCenter = targetCard.getBoundingClientRect().left + targetCard.offsetWidth / 2
-
-  viewport.scrollBy({ left: targetCenter - viewportCenter, behavior: 'smooth' })
+  activeProjectIndex.value =
+    (activeProjectIndex.value + direction + totalProjects) % totalProjects
 }
 
 function openProject(project: Project) {
@@ -607,9 +596,8 @@ watch(activeProjectId, (project) => {
   document.body.classList.toggle('modal-open', Boolean(project))
 })
 
-watch(activeFilter, async () => {
-  await nextTick()
-  projectViewport.value?.scrollTo({ left: 0, behavior: 'smooth' })
+watch(activeFilter, () => {
+  activeProjectIndex.value = 0
 })
 
 watch(isMenuOpen, (isOpen) => {
@@ -635,9 +623,21 @@ onMounted(() => {
     revealObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const element = entry.target as HTMLElement
+
+          if (element.classList.contains('tools-list')) {
+            if (entry.isIntersecting) {
+              element.classList.remove('is-visible')
+              window.requestAnimationFrame(() => element.classList.add('is-visible'))
+            } else {
+              element.classList.remove('is-visible')
+            }
+            return
+          }
+
           if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-            revealObserver?.unobserve(entry.target)
+            element.classList.add('is-visible')
+            revealObserver?.unobserve(element)
           }
         })
       },
@@ -748,6 +748,9 @@ onBeforeUnmount(() => {
               <a class="button button-primary" href="#projects"
                 >{{ copy.viewProjects }} <span aria-hidden="true">-&gt;</span></a
               >
+              <a class="button button-dark" :href="cvUrl" :download="cvFilename"
+                >{{ copy.downloadCv }} <span aria-hidden="true">&darr;</span></a
+              >
               <a class="text-link" href="#experience"
                 >{{ copy.viewJourney }} <span aria-hidden="true">&darr;</span></a
               >
@@ -814,15 +817,6 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section class="toolbelt" :aria-label="copy.toolbeltAria">
-        <div class="shell toolbelt-track">
-          <span>Java</span><i></i><span>Spring Boot</span><i></i><span>Quarkus</span><i></i>
-          <span>PostgreSQL</span><i></i><span>Oracle Database</span><i></i><span>MariaDB</span><i></i>
-          <span>GitLab CI/CD</span><i></i>
-          <span>Docker</span><i></i><span>OpenShift</span>
-        </div>
-      </section>
-
       <section id="about" class="section-pad about-section">
         <div class="shell about-grid">
           <div class="section-intro" data-reveal>
@@ -832,6 +826,7 @@ onBeforeUnmount(() => {
 
           <div class="about-copy" data-reveal>
             <p class="about-lead">{{ copy.aboutLead }}</p>
+            <p class="about-availability">{{ copy.aboutAvailability }}</p>
             <div class="about-columns">
               <p>{{ copy.aboutData }}</p>
               <p>{{ copy.aboutDelivery }}</p>
@@ -843,31 +838,34 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section id="expertise" class="section-pad expertise-section">
-        <div class="shell">
-          <div class="section-heading" data-reveal>
-            <div>
-              <p class="eyebrow">{{ copy.expertiseEyebrow }}</p>
-              <h2>{{ copy.toolsTitle }}</h2>
+      <section id="experience" class="section-pad experience-section">
+        <div class="shell experience-layout">
+          <div class="experience-sticky" data-reveal>
+            <p class="eyebrow">{{ copy.experienceEyebrow }}</p>
+            <h2>{{ copy.experienceTitle }}</h2>
+            <p>{{ copy.experienceIntro }}</p>
+
+            <div class="education-card">
+              <small>{{ copy.education }}</small>
+              <strong>{{ copy.degree }}</strong>
+              <span>{{ copy.university }}</span>
+              <span>2017 - 2021</span>
             </div>
           </div>
 
-          <ul class="tools-list" data-reveal :aria-label="copy.toolsAria">
-            <li v-for="(tool, index) in tools" :key="tool.name" :style="{ '--item-index': index }">
-              <span class="tool-logo" :style="{ '--tool-color': `#${tool.color}` }">
-                <PrakosaLogo v-if="tool.customLogo" class="tool-custom-logo" />
-                <img
-                  v-else-if="tool.slug && !brokenToolLogos.includes(tool.name)"
-                  :src="`https://cdn.simpleicons.org/${tool.slug}/${tool.color}`"
-                  :alt="`${copy.logo} ${tool.name}`"
-                  loading="lazy"
-                  @error="markToolLogoBroken(tool.name)"
-                />
-                <span v-else class="tool-logo-fallback" aria-hidden="true">{{ tool.mark }}</span>
-              </span>
-              <span class="tool-name">{{ tool.name }}</span>
+          <ol class="experience-list">
+            <li v-for="(experience, index) in localizedExperiences" :key="experience.company" data-reveal>
+              <div class="timeline-marker">
+                <span>{{ String(index + 1).padStart(2, '0') }}</span>
+              </div>
+              <article>
+                <p class="experience-period">{{ experience.period }}</p>
+                <h3>{{ experience.company }}</h3>
+                <p class="experience-role">{{ experience.role }}</p>
+                <p class="experience-summary">{{ experience.summary }}</p>
+              </article>
             </li>
-          </ul>
+          </ol>
         </div>
       </section>
 
@@ -900,53 +898,68 @@ onBeforeUnmount(() => {
             </button>
           </div>
 
-          <div class="carousel-actions" data-reveal>
-            <p><span></span> {{ copy.carouselHint }}</p>
-            <div>
-              <button type="button" :aria-label="copy.previousProject" @click="scrollProjects(-1)">
-                &larr;
-              </button>
-              <button type="button" :aria-label="copy.nextProject" @click="scrollProjects(1)">
-                &rarr;
-              </button>
-            </div>
-          </div>
+          <div class="project-stage">
+            <button
+              type="button"
+              class="project-nav-button project-nav-previous"
+              :aria-label="copy.previousProject"
+              @click="rotateProjects(-1)"
+            >
+              <svg class="project-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m14.5 5-7 7 7 7" />
+              </svg>
+            </button>
 
-          <div
-            ref="projectViewport"
-            class="project-viewport"
-            tabindex="0"
-            :aria-label="copy.projectCarousel"
-          >
-            <TransitionGroup name="project-list" tag="div" class="project-track">
-              <article
-                v-for="project in filteredProjects"
-                :key="project.id"
-                class="project-card"
-              >
-                <div class="project-card-copy">
-                  <div class="project-context">
-                    <span>{{ project.context }}</span
-                    ><span>{{ project.code }}</span>
+            <div
+              class="project-viewport"
+              tabindex="0"
+              :aria-label="copy.projectCarousel"
+              @keydown.left.prevent="rotateProjects(-1)"
+              @keydown.right.prevent="rotateProjects(1)"
+            >
+              <div class="project-track" :style="projectTrackStyle">
+                <article
+                  v-for="(project, index) in filteredProjects"
+                  :key="project.id"
+                  :class="['project-card', { 'is-active': index === activeProjectIndex }]"
+                  :style="projectCardStyle(index)"
+                  :aria-current="index === activeProjectIndex ? 'true' : undefined"
+                >
+                  <div class="project-card-copy">
+                    <div class="project-context">
+                      <span>{{ project.context }}</span
+                      ><span>{{ project.code }}</span>
+                    </div>
+                    <h3>{{ project.name }}</h3>
+                    <p>{{ project.detail }}</p>
+                    <ul>
+                      <li v-for="technology in project.technologies.slice(0, 3)" :key="technology">
+                        {{ technology }}
+                      </li>
+                    </ul>
+                    <button
+                      type="button"
+                      class="project-detail-button"
+                      :aria-label="copy.projectDetails.replace('{name}', project.name)"
+                      @click="openProject(project)"
+                    >
+                      <span>{{ copy.seeDetails }}</span><span aria-hidden="true">&nearr;</span>
+                    </button>
                   </div>
-                  <h3>{{ project.name }}</h3>
-                  <p>{{ project.detail }}</p>
-                  <ul>
-                    <li v-for="technology in project.technologies.slice(0, 3)" :key="technology">
-                      {{ technology }}
-                    </li>
-                  </ul>
-                  <button
-                    type="button"
-                    class="project-detail-button"
-                    :aria-label="copy.projectDetails.replace('{name}', project.name)"
-                    @click="openProject(project)"
-                  >
-                    <span>{{ copy.seeDetails }}</span><span aria-hidden="true">&nearr;</span>
-                  </button>
-                </div>
-              </article>
-            </TransitionGroup>
+                </article>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="project-nav-button project-nav-next"
+              :aria-label="copy.nextProject"
+              @click="rotateProjects(1)"
+            >
+              <svg class="project-nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9.5 5 7 7-7 7" />
+              </svg>
+            </button>
           </div>
 
           <p class="more-projects" data-reveal>
@@ -956,34 +969,31 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section id="experience" class="section-pad experience-section">
-        <div class="shell experience-layout">
-          <div class="experience-sticky" data-reveal>
-            <p class="eyebrow">{{ copy.experienceEyebrow }}</p>
-            <h2>{{ copy.experienceTitle }}</h2>
-            <p>{{ copy.experienceIntro }}</p>
-
-            <div class="education-card">
-              <small>{{ copy.education }}</small>
-              <strong>{{ copy.degree }}</strong>
-              <span>{{ copy.university }}</span>
-              <span>2017 - 2021</span>
+      <section id="expertise" class="section-pad expertise-section">
+        <div class="shell">
+          <div class="section-heading" data-reveal>
+            <div>
+              <p class="eyebrow">{{ copy.expertiseEyebrow }}</p>
+              <h2>{{ copy.toolsTitle }}</h2>
             </div>
           </div>
 
-          <ol class="experience-list">
-            <li v-for="(experience, index) in localizedExperiences" :key="experience.company" data-reveal>
-              <div class="timeline-marker">
-                <span>{{ String(index + 1).padStart(2, '0') }}</span>
-              </div>
-              <article>
-                <p class="experience-period">{{ experience.period }}</p>
-                <h3>{{ experience.company }}</h3>
-                <p class="experience-role">{{ experience.role }}</p>
-                <p class="experience-summary">{{ experience.summary }}</p>
-              </article>
+          <ul class="tools-list" data-reveal :aria-label="copy.toolsAria">
+            <li v-for="(tool, index) in tools" :key="tool.name" :style="{ '--item-index': index }">
+              <span class="tool-logo" :style="{ '--tool-color': `#${tool.color}` }">
+                <PrakosaLogo v-if="tool.customLogo" class="tool-custom-logo" />
+                <img
+                  v-else-if="tool.slug && !brokenToolLogos.includes(tool.name)"
+                  :src="`https://cdn.simpleicons.org/${tool.slug}/${tool.color}`"
+                  :alt="`${copy.logo} ${tool.name}`"
+                  loading="lazy"
+                  @error="markToolLogoBroken(tool.name)"
+                />
+                <span v-else class="tool-logo-fallback" aria-hidden="true">{{ tool.mark }}</span>
+              </span>
+              <span class="tool-name">{{ tool.name }}</span>
             </li>
-          </ol>
+          </ul>
         </div>
       </section>
 
@@ -1054,7 +1064,6 @@ onBeforeUnmount(() => {
     <footer class="site-footer">
       <div class="shell footer-inner">
         <p>&copy; {{ currentYear }} Prakosa Dwi Prasetya</p>
-        <p>{{ copy.siteMadeWith }}</p>
         <a href="#home">{{ copy.backToTop }} &uarr;</a>
       </div>
     </footer>
