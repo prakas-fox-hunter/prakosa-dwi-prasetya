@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import PrakosaLogo from '@/components/PrakosaLogo.vue'
+import { getNextSlideIndex, getPreviousSlideIndex } from '@/utils/carousel'
 
 type Theme = 'light' | 'dark'
 type Locale = 'id' | 'en'
@@ -50,6 +51,20 @@ const translations = {
     workflowHeading: 'Dari kebutuhan sampai siap rilis.',
     workflowCaption: 'Membangun layanan yang mudah digunakan dan dirawat.',
     workflowAria: 'Alur dari layanan API hingga deployment',
+    previousWorkflowSlide: 'Lihat slide sebelumnya',
+    nextWorkflowSlide: 'Lihat slide berikutnya',
+    workflowCarousel: 'Carousel alur kerja',
+    workflowSlideOneAnnouncement: 'Slide 1 dari 2: Dari kebutuhan sampai siap rilis.',
+    workflowSlideTwoAnnouncement: 'Slide 2 dari 2: Teknologi yang digunakan.',
+    technologyHeading: 'Teknologi yang digunakan.',
+    technologyCaption: 'Teknologi untuk membangun, menyimpan, dan merilis aplikasi.',
+    technologyAria: 'Ringkasan teknologi yang digunakan',
+    technologyLanguages: 'JAVA / FRAMEWORK',
+    technologyLanguageList: 'Java / Spring Boot / Quarkus',
+    technologyDatabases: 'DATABASE',
+    technologyDatabaseList: 'PostgreSQL / Oracle / MariaDB',
+    technologyDelivery: 'DELIVERY',
+    technologyDeliveryList: 'GitLab CI/CD / Docker / OpenShift',
     service: 'LAYANAN',
     data: 'DATA',
     release: 'RILIS',
@@ -144,6 +159,20 @@ const translations = {
     workflowHeading: 'From requirements to release.',
     workflowCaption: 'Building services that are easy to use and maintain.',
     workflowAria: 'Workflow from API services to deployment',
+    previousWorkflowSlide: 'View previous slide',
+    nextWorkflowSlide: 'View next slide',
+    workflowCarousel: 'Workflow carousel',
+    workflowSlideOneAnnouncement: 'Slide 1 of 2: From requirements to release.',
+    workflowSlideTwoAnnouncement: 'Slide 2 of 2: Technologies I use.',
+    technologyHeading: 'Technologies I use.',
+    technologyCaption: 'Tools for building, storing, and releasing applications.',
+    technologyAria: 'Summary of technologies I use',
+    technologyLanguages: 'JAVA / FRAMEWORK',
+    technologyLanguageList: 'Java / Spring Boot / Quarkus',
+    technologyDatabases: 'DATABASES',
+    technologyDatabaseList: 'PostgreSQL / Oracle / MariaDB',
+    technologyDelivery: 'DELIVERY',
+    technologyDeliveryList: 'GitLab CI/CD / Docker / OpenShift',
     service: 'SERVICE',
     data: 'DATA',
     release: 'RELEASE',
@@ -462,6 +491,8 @@ const filters: { value: 'all' | ProjectCategory }[] = [
 const activeFilter = ref<'all' | ProjectCategory>('all')
 const activeProjectIndex = ref(0)
 const activeProjectId = ref<string | null>(null)
+const activeMapSlide = ref(0)
+const mapSlideCount = 2
 const activeSection = ref('home')
 const isMenuOpen = ref(false)
 const theme = ref<Theme>('light')
@@ -513,6 +544,14 @@ const copyLabel = computed(() =>
       ? email
       : copy.value.copyEmail,
 )
+const mapSlideIndexLabel = computed(
+  () => `${String(activeMapSlide.value + 1).padStart(2, '0')} / ${String(mapSlideCount).padStart(2, '0')}`,
+)
+const mapSlideAnnouncement = computed(() =>
+  activeMapSlide.value === 0
+    ? copy.value.workflowSlideOneAnnouncement
+    : copy.value.workflowSlideTwoAnnouncement,
+)
 
 let revealObserver: IntersectionObserver | undefined
 let sectionObserver: IntersectionObserver | undefined
@@ -546,6 +585,13 @@ function rotateProjects(direction: 1 | -1) {
 
   activeProjectIndex.value =
     (activeProjectIndex.value + direction + totalProjects) % totalProjects
+}
+
+function rotateMapSlides(direction: 1 | -1) {
+  activeMapSlide.value =
+    direction === 1
+      ? getNextSlideIndex(activeMapSlide.value, mapSlideCount)
+      : getPreviousSlideIndex(activeMapSlide.value, mapSlideCount)
 }
 
 function openProject(project: Project) {
@@ -758,54 +804,133 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="hero-visual" data-reveal>
-            <div class="system-map" role="group" aria-labelledby="system-map-title">
+            <div
+              class="system-map"
+              role="region"
+              :aria-roledescription="copy.workflowCarousel"
+              aria-labelledby="system-map-title"
+            >
               <div class="system-map-header">
                 <span class="map-kicker"><i></i> {{ copy.workflow }}</span>
-                <span class="map-index">01 / 03</span>
-              </div>
-
-              <div class="system-map-heading">
-                <p>{{ copy.javaDevelopment }}</p>
-                <h2 id="system-map-title">{{ copy.workflowHeading }}</h2>
-                <span class="map-caption">{{ copy.workflowCaption }}</span>
-              </div>
-
-              <div class="system-flow" role="list" :aria-label="copy.workflowAria">
-                <div class="system-node" role="listitem">
-                  <span class="node-icon">API</span>
-                  <div class="node-copy">
-                  <span class="node-label">01 / {{ copy.service }}</span>
-                    <strong>{{ copy.apiService }}</strong>
-                    <small>Spring Boot / Quarkus</small>
-                  </div>
-                  <span class="node-status" aria-hidden="true"></span>
-                </div>
-                <span class="flow-connector" aria-hidden="true"><i></i></span>
-                <div class="system-node" role="listitem">
-                  <span class="node-icon node-icon-data">DB</span>
-                  <div class="node-copy">
-                  <span class="node-label">02 / {{ copy.data }}</span>
-                    <strong>{{ copy.dataStorage }}</strong>
-                    <small>PostgreSQL / Oracle</small>
-                  </div>
-                  <span class="node-status" aria-hidden="true"></span>
-                </div>
-                <span class="flow-connector" aria-hidden="true"><i></i></span>
-                <div class="system-node" role="listitem">
-                  <span class="node-icon node-icon-delivery">CI</span>
-                  <div class="node-copy">
-                  <span class="node-label">03 / {{ copy.release }}</span>
-                    <strong>{{ copy.appRelease }}</strong>
-                    <small>GitLab CI/CD / Docker</small>
-                  </div>
-                  <span class="node-status" aria-hidden="true"></span>
+                <div class="system-map-controls">
+                  <button
+                    class="system-map-nav system-map-nav-previous"
+                    type="button"
+                    :aria-label="copy.previousWorkflowSlide"
+                    aria-controls="system-map-slide"
+                    @click="rotateMapSlides(-1)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m14 5-7 7 7 7M8 12h9" />
+                    </svg>
+                  </button>
+                  <span class="map-index" aria-hidden="true">{{ mapSlideIndexLabel }}</span>
+                  <button
+                    class="system-map-nav system-map-nav-next"
+                    type="button"
+                    :aria-label="copy.nextWorkflowSlide"
+                    aria-controls="system-map-slide"
+                    @click="rotateMapSlides(1)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m10 5 7 7-7 7M16 12H7" />
+                    </svg>
+                  </button>
                 </div>
               </div>
 
-              <div class="system-map-footer">
-                <span><i></i> {{ copy.city }}</span>
-                <span>BACKEND <b>/</b> DATA <b>/</b> {{ copy.release }}</span>
-              </div>
+              <Transition name="system-map-slide" mode="out-in">
+                <div v-if="activeMapSlide === 0" id="system-map-slide" class="system-map-slide" key="workflow">
+                  <div class="system-map-heading">
+                    <p>{{ copy.javaDevelopment }}</p>
+                    <h2 id="system-map-title">{{ copy.workflowHeading }}</h2>
+                    <span class="map-caption">{{ copy.workflowCaption }}</span>
+                  </div>
+
+                  <div class="system-flow" role="list" :aria-label="copy.workflowAria">
+                    <div class="system-node" role="listitem">
+                      <span class="node-icon">API</span>
+                      <div class="node-copy">
+                      <span class="node-label">01 / {{ copy.service }}</span>
+                        <strong>{{ copy.apiService }}</strong>
+                        <small>Spring Boot / Quarkus</small>
+                      </div>
+                      <span class="node-status" aria-hidden="true"></span>
+                    </div>
+                <span class="flow-connector" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 4v16M6 14l6 6 6-6" /></svg>
+                </span>
+                    <div class="system-node" role="listitem">
+                      <span class="node-icon node-icon-data">DB</span>
+                      <div class="node-copy">
+                      <span class="node-label">02 / {{ copy.data }}</span>
+                        <strong>{{ copy.dataStorage }}</strong>
+                        <small>PostgreSQL / Oracle</small>
+                      </div>
+                      <span class="node-status" aria-hidden="true"></span>
+                    </div>
+                <span class="flow-connector" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 4v16M6 14l6 6 6-6" /></svg>
+                </span>
+                    <div class="system-node" role="listitem">
+                      <span class="node-icon node-icon-delivery">CI</span>
+                      <div class="node-copy">
+                      <span class="node-label">03 / {{ copy.release }}</span>
+                        <strong>{{ copy.appRelease }}</strong>
+                        <small>GitLab CI/CD / Docker</small>
+                      </div>
+                      <span class="node-status" aria-hidden="true"></span>
+                    </div>
+                  </div>
+
+                  <div class="system-map-footer">
+                    <span><i></i> {{ copy.city }}</span>
+                    <span>BACKEND <b>/</b> DATA <b>/</b> {{ copy.release }}</span>
+                  </div>
+                </div>
+
+                <div v-else id="system-map-slide" class="system-map-slide" key="technologies">
+                  <div class="system-map-heading">
+                    <p>{{ copy.javaDevelopment }}</p>
+                    <h2 id="system-map-title">{{ copy.technologyHeading }}</h2>
+                    <span class="map-caption">{{ copy.technologyCaption }}</span>
+                  </div>
+
+                  <div class="system-flow technology-flow" role="list" :aria-label="copy.technologyAria">
+                    <div class="system-node" role="listitem">
+                      <span class="node-icon">JV</span>
+                      <div class="node-copy">
+                        <span class="node-label">01 / {{ copy.technologyLanguages }}</span>
+                        <strong>{{ copy.technologyLanguageList }}</strong>
+                      </div>
+                      <span class="node-status" aria-hidden="true"></span>
+                    </div>
+                    <div class="system-node" role="listitem">
+                      <span class="node-icon node-icon-data">DB</span>
+                      <div class="node-copy">
+                        <span class="node-label">02 / {{ copy.technologyDatabases }}</span>
+                        <strong>{{ copy.technologyDatabaseList }}</strong>
+                      </div>
+                      <span class="node-status" aria-hidden="true"></span>
+                    </div>
+                    <div class="system-node" role="listitem">
+                      <span class="node-icon node-icon-delivery">CI</span>
+                      <div class="node-copy">
+                        <span class="node-label">03 / {{ copy.technologyDelivery }}</span>
+                        <strong>{{ copy.technologyDeliveryList }}</strong>
+                      </div>
+                      <span class="node-status" aria-hidden="true"></span>
+                    </div>
+                  </div>
+
+                  <div class="system-map-footer">
+                    <span><i></i> {{ copy.city }}</span>
+                    <span>BACKEND <b>/</b> DATA <b>/</b> {{ copy.release }}</span>
+                  </div>
+                </div>
+              </Transition>
+
+              <p class="sr-only" aria-live="polite" aria-atomic="true">{{ mapSlideAnnouncement }}</p>
             </div>
           </div>
 

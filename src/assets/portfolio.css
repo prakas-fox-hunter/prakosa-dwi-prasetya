@@ -139,6 +139,17 @@ ol {
   top: 16px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .eyebrow {
   margin-bottom: 17px;
   color: var(--blue-dark);
@@ -568,6 +579,45 @@ ol {
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 
+.system-map-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.system-map-nav {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  color: #d8efff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: 50%;
+  place-items: center;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.system-map-nav:hover {
+  color: #081a33;
+  background: var(--lime);
+  border-color: var(--lime);
+  transform: translateY(-1px);
+}
+
+.system-map-nav svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 .map-kicker,
 .map-index,
 .system-map-heading > p,
@@ -629,11 +679,40 @@ ol {
   font-size: 0.75rem;
 }
 
+.system-map-slide {
+  min-height: 454px;
+}
+
+.system-map-slide-enter-active,
+.system-map-slide-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.system-map-slide-enter-from {
+  opacity: 0;
+  transform: translateX(10px);
+}
+
+.system-map-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
 .system-flow {
   position: relative;
   z-index: 1;
   display: grid;
   margin-top: 24px;
+}
+
+.technology-flow {
+  gap: 12px;
+}
+
+.technology-flow .system-node {
+  min-height: 70px;
 }
 
 .system-node {
@@ -713,14 +792,17 @@ ol {
   background: rgba(147, 197, 253, 0.42);
 }
 
-.flow-connector i {
+.flow-connector svg {
   position: absolute;
-  bottom: -1px;
-  left: -3px;
-  width: 7px;
-  height: 7px;
-  background: #60a5fa;
-  border-radius: 50%;
+  bottom: -7px;
+  left: -9px;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: #60a5fa;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .system-map-footer {
@@ -1865,6 +1947,19 @@ ol {
     font-size: 1.75rem;
   }
 
+  .system-map-controls {
+    gap: 5px;
+  }
+
+  .system-map-nav {
+    width: 28px;
+    height: 28px;
+  }
+
+  .system-map-slide {
+    min-height: 422px;
+  }
+
   .system-node {
     grid-template-columns: 36px minmax(0, 1fr) 7px;
     gap: 10px;
@@ -1969,6 +2064,11 @@ ol {
   .project-card,
   .project-card:hover {
     transform: none !important;
+  }
+
+  .system-map-slide-enter-active,
+  .system-map-slide-leave-active {
+    transition: none !important;
   }
 
   .tools-list.is-visible li {
