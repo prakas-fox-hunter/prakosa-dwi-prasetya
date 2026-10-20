@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 import PrakosaLogo from '@/components/PrakosaLogo.vue'
 import { getNextSlideIndex, getPreviousSlideIndex } from '@/utils/carousel'
+import { demoProjectExamples } from '@/utils/projectExamples'
 
 type Theme = 'light' | 'dark'
 type Locale = 'id' | 'en'
@@ -55,16 +57,12 @@ const translations = {
     nextWorkflowSlide: 'Lihat slide berikutnya',
     workflowCarousel: 'Carousel alur kerja',
     workflowSlideOneAnnouncement: 'Slide 1 dari 2: Dari kebutuhan sampai siap rilis.',
-    workflowSlideTwoAnnouncement: 'Slide 2 dari 2: Teknologi yang digunakan.',
-    technologyHeading: 'Teknologi yang digunakan.',
-    technologyCaption: 'Teknologi untuk membangun, menyimpan, dan merilis aplikasi.',
-    technologyAria: 'Ringkasan teknologi yang digunakan',
-    technologyLanguages: 'JAVA / FRAMEWORK',
-    technologyLanguageList: 'Java / Spring Boot / Quarkus',
-    technologyDatabases: 'DATABASE',
-    technologyDatabaseList: 'PostgreSQL / Oracle / MariaDB',
-    technologyDelivery: 'DELIVERY',
-    technologyDeliveryList: 'GitLab CI/CD / Docker / OpenShift',
+    workflowSlideTwoAnnouncement: 'Slide 2 dari 2: Project Example.',
+    technologyHeading: 'Project Example',
+    technologyCaption: 'Contoh project dummy yang bisa dicoba tanpa koneksi database.',
+    technologyAria: 'Contoh project dummy',
+    monitoringProject: 'Web Monitoring',
+    swaggerProject: 'Swagger API',
     service: 'LAYANAN',
     data: 'DATA',
     release: 'RILIS',
@@ -163,16 +161,12 @@ const translations = {
     nextWorkflowSlide: 'View next slide',
     workflowCarousel: 'Workflow carousel',
     workflowSlideOneAnnouncement: 'Slide 1 of 2: From requirements to release.',
-    workflowSlideTwoAnnouncement: 'Slide 2 of 2: Technologies I use.',
-    technologyHeading: 'Technologies I use.',
-    technologyCaption: 'Tools for building, storing, and releasing applications.',
-    technologyAria: 'Summary of technologies I use',
-    technologyLanguages: 'JAVA / FRAMEWORK',
-    technologyLanguageList: 'Java / Spring Boot / Quarkus',
-    technologyDatabases: 'DATABASES',
-    technologyDatabaseList: 'PostgreSQL / Oracle / MariaDB',
-    technologyDelivery: 'DELIVERY',
-    technologyDeliveryList: 'GitLab CI/CD / Docker / OpenShift',
+    workflowSlideTwoAnnouncement: 'Slide 2 of 2: Project Example.',
+    technologyHeading: 'Project Example',
+    technologyCaption: 'Dummy projects you can try without a database connection.',
+    technologyAria: 'Dummy project examples',
+    monitoringProject: 'Web Monitoring',
+    swaggerProject: 'Swagger API',
     service: 'SERVICE',
     data: 'DATA',
     release: 'RELEASE',
@@ -889,38 +883,43 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
 
-                <div v-else id="system-map-slide" class="system-map-slide" key="technologies">
+                <div v-else id="system-map-slide" class="system-map-slide" key="project-example">
                   <div class="system-map-heading">
                     <p>{{ copy.javaDevelopment }}</p>
                     <h2 id="system-map-title">{{ copy.technologyHeading }}</h2>
                     <span class="map-caption">{{ copy.technologyCaption }}</span>
                   </div>
 
-                  <div class="system-flow technology-flow" role="list" :aria-label="copy.technologyAria">
-                    <div class="system-node" role="listitem">
-                      <span class="node-icon">JV</span>
+                  <div class="system-flow technology-flow project-example-flow" role="list" :aria-label="copy.technologyAria">
+                    <RouterLink
+                      v-for="(project, index) in demoProjectExamples"
+                      :key="project.slug"
+                      :class="`project-example-card project-example-card-${project.icon}`"
+                      class="system-node"
+                      :to="project.route"
+                    >
+                      <span v-if="project.icon === 'monitoring'" class="node-icon project-example-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <rect x="3" y="4" width="18" height="13" rx="2" />
+                          <path d="M8 21h8M12 17v4M6 13l3-3 2 2 4-4 3 2" />
+                        </svg>
+                      </span>
+                      <span v-else class="node-icon project-example-icon project-example-icon-swagger" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z" />
+                          <path d="M15.7 8.2c-.8-.7-1.8-1-3-1-1.7 0-2.8.8-2.8 2 0 1.4 1.2 1.7 2.8 2.1 1.6.4 2.7.7 2.7 2.1 0 1.2-1.2 2-2.9 2-1.2 0-2.4-.4-3.2-1.2" />
+                        </svg>
+                      </span>
                       <div class="node-copy">
-                        <span class="node-label">01 / {{ copy.technologyLanguages }}</span>
-                        <strong>{{ copy.technologyLanguageList }}</strong>
+                        <span class="node-label">0{{ index + 1 }} / {{ project.slug === 'monitoring' ? copy.monitoringProject : copy.swaggerProject }}</span>
+                        <strong>{{ project.slug === 'monitoring' ? copy.monitoringProject : copy.swaggerProject }}</strong>
+                        <span class="project-example-card-action">
+                          {{ project.action }}
+                          <span aria-hidden="true">-&gt;</span>
+                        </span>
                       </div>
                       <span class="node-status" aria-hidden="true"></span>
-                    </div>
-                    <div class="system-node" role="listitem">
-                      <span class="node-icon node-icon-data">DB</span>
-                      <div class="node-copy">
-                        <span class="node-label">02 / {{ copy.technologyDatabases }}</span>
-                        <strong>{{ copy.technologyDatabaseList }}</strong>
-                      </div>
-                      <span class="node-status" aria-hidden="true"></span>
-                    </div>
-                    <div class="system-node" role="listitem">
-                      <span class="node-icon node-icon-delivery">CI</span>
-                      <div class="node-copy">
-                        <span class="node-label">03 / {{ copy.technologyDelivery }}</span>
-                        <strong>{{ copy.technologyDeliveryList }}</strong>
-                      </div>
-                      <span class="node-status" aria-hidden="true"></span>
-                    </div>
+                    </RouterLink>
                   </div>
 
                   <div class="system-map-footer">

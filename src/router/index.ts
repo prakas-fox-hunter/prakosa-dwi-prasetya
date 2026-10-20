@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import DummyMonitoringView from '../views/DummyMonitoringView.vue'
+import DummySwaggerView from '../views/DummySwaggerView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,6 +10,16 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+    },
+    {
+      path: '/dummy-monitoring',
+      name: 'dummy-monitoring',
+      component: DummyMonitoringView,
+    },
+    {
+      path: '/dummy-swagger',
+      name: 'dummy-swagger',
+      component: DummySwaggerView,
     },
     {
       path: '/:pathMatch(.*)*',

@@ -715,6 +715,90 @@ ol {
   min-height: 70px;
 }
 
+.project-example-flow {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.project-example-card {
+  min-height: 170px;
+  color: #f5f8ff;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.project-example-card:hover,
+.project-example-card:focus-visible {
+  background: rgba(56, 189, 248, 0.13);
+  border-color: rgba(125, 211, 252, 0.7);
+  box-shadow: 0 14px 30px rgba(3, 16, 31, 0.22);
+  transform: translateY(-3px);
+}
+
+.project-example-card:focus-visible {
+  outline: 3px solid rgba(167, 237, 255, 0.5);
+  outline-offset: 3px;
+}
+
+.project-example-card .node-copy {
+  align-self: stretch;
+  gap: 5px;
+}
+
+.project-example-card .node-copy strong {
+  overflow: visible;
+  font-size: 0.86rem;
+  white-space: normal;
+}
+
+.project-example-card .node-copy p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.65rem;
+  line-height: 1.45;
+}
+
+.project-example-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: auto;
+  color: #a7edff;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.project-example-card:hover .project-example-card-action,
+.project-example-card:focus-visible .project-example-card-action {
+  color: #ffffff;
+}
+
+.project-example-icon {
+  color: #b9f2ff;
+  background: linear-gradient(145deg, rgba(56, 189, 248, 0.27), rgba(14, 116, 144, 0.22));
+}
+
+.project-example-icon-swagger {
+  color: #dbeafe;
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.44), rgba(30, 64, 175, 0.28));
+  border-color: rgba(147, 197, 253, 0.45);
+}
+
+.project-example-icon svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.55;
+}
+
 .system-node {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) 8px;
@@ -1743,6 +1827,10 @@ ol {
 
   .system-map {
     min-height: 0;
+  }
+
+  .project-example-flow {
+    grid-template-columns: 1fr;
   }
 
   .contact-panel {
