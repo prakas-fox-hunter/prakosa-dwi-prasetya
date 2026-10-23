@@ -904,6 +904,12 @@ onBeforeUnmount(() => {
                           <path d="M8 21h8M12 17v4M6 13l3-3 2 2 4-4 3 2" />
                         </svg>
                       </span>
+                      <span v-else-if="project.icon === 'swagger'" class="node-icon project-example-icon project-example-icon-swagger" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z" />
+                          <path d="M15.7 8.2c-.8-.7-1.8-1-3-1-1.7 0-2.8.8-2.8 2 0 1.4 1.2 1.7 2.8 2.1 1.6.4 2.7.7 2.7 2.1 0 1.2-1.2 2-2.9 2-1.2 0-2.4-.4-3.2-1.2" />
+                        </svg>
+                      </span>
                       <span v-else class="node-icon project-example-icon project-example-icon-swagger" aria-hidden="true">
                         <svg viewBox="0 0 24 24">
                           <path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z" />

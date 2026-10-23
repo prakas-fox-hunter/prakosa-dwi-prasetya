@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import monitoringServerVisual from '@/assets/monitoring-server-visual.svg'
+import VoiceChatView from '@/views/VoiceChatView.vue'
 import {
   demoMonitoringMenu,
   getDemoDashboardMetrics,
@@ -16,7 +17,12 @@ const authMode = ref<AuthMode>('login')
 const isAuthenticated = ref(false)
 const isDarkMode = ref(true)
 const isSidebarCollapsed = ref(false)
-const activeMenu = ref<DemoMonitoringMenuKey>('home')
+const route = useRoute()
+const router = useRouter()
+const requestedMenu = route.query.menu
+const initialMenu: DemoMonitoringMenuKey =
+  requestedMenu === 'voice-chat' || requestedMenu === 'location' ? requestedMenu : 'home'
+const activeMenu = ref<DemoMonitoringMenuKey>(initialMenu)
 const message = ref('')
 const messageIsError = ref(false)
 const form = reactive({
@@ -41,6 +47,90 @@ const alerts = [
   { name: 'Error rate', target: 'API Gateway', state: 'Armed', threshold: '> 2%' },
   { name: 'Service down', target: 'All services', state: 'Armed', threshold: '0% uptime' },
 ]
+type MapLocation = {
+  latitude: number
+  longitude: number
+}
+
+const defaultLocation: MapLocation = { latitude: -6.2088, longitude: 106.8456 }
+const markedLocation = ref<MapLocation | null>(null)
+const locationStatus = ref('')
+type JourneyState = 'idle' | 'tracking' | 'stopped'
+type JourneyEventType = 'start' | 'mark' | 'stop'
+type JourneyEvent = {
+  type: JourneyEventType
+  location: MapLocation | null
+  timestamp: number
+}
+type JourneyRecord = {
+  id: number
+  name: string
+  startedAt: number
+  stoppedAt: number | null
+  events: JourneyEvent[]
+}
+
+const journeyState = ref<JourneyState>('idle')
+const journeyStatus = ref('Ready to start a journey.')
+const journeyStops = ref<MapLocation[]>([])
+const journeyNameInput = ref('')
+const isJourneyNamePromptOpen = ref(false)
+const currentJourney = ref<JourneyRecord | null>(null)
+const journeyHistory = ref<JourneyRecord[]>([])
+let locationWatchId: number | null = null
+
+const geolocationOptions: PositionOptions = {
+  enableHighAccuracy: true,
+  timeout: 10000,
+  maximumAge: 0,
+}
+
+function createMapUrl(location: MapLocation, embed: boolean) {
+  const latitudeOffset = 0.09
+  const longitudeOffset = 0.085
+  const minimumLongitude = (location.longitude - longitudeOffset).toFixed(6)
+  const minimumLatitude = (location.latitude - latitudeOffset).toFixed(6)
+  const maximumLongitude = (location.longitude + longitudeOffset).toFixed(6)
+  const maximumLatitude = (location.latitude + latitudeOffset).toFixed(6)
+  const marker = `${location.latitude.toFixed(6)},${location.longitude.toFixed(6)}`
+  const center = `13/${marker}`
+
+  if (embed) {
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${minimumLongitude}%2C${minimumLatitude}%2C${maximumLongitude}%2C${maximumLatitude}&layer=mapnik&marker=${marker}#map=${center}`
+  }
+
+  return `https://www.openstreetmap.org/?mlat=${location.latitude.toFixed(6)}&mlon=${location.longitude.toFixed(6)}#map=${center}`
+}
+
+function getWeekStart(timestamp: number) {
+  const date = new Date(timestamp)
+  const day = date.getDay()
+  const daysFromMonday = day === 0 ? -6 : 1 - day
+  date.setDate(date.getDate() + daysFromMonday)
+  date.setHours(0, 0, 0, 0)
+  return date
+}
+
+const locationMapUrl = computed(() => createMapUrl(markedLocation.value ?? defaultLocation, true))
+const fullLocationMapUrl = computed(() => createMapUrl(markedLocation.value ?? defaultLocation, false))
+const locationLabel = computed(() => (markedLocation.value ? 'My device location' : 'Jakarta, Indonesia'))
+const weeklyJourneys = computed(() => {
+  const groups = new Map<string, { key: string; label: string; journeys: JourneyRecord[] }>()
+
+  for (const journey of journeyHistory.value) {
+    const weekStart = getWeekStart(journey.startedAt)
+    const key = `${weekStart.getFullYear()}-${weekStart.getMonth() + 1}-${weekStart.getDate()}`
+    const group = groups.get(key) ?? {
+      key,
+      label: `Week of ${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`,
+      journeys: [],
+    }
+    group.journeys.push(journey)
+    groups.set(key, group)
+  }
+
+  return [...groups.values()]
+})
 
 const authTitle = computed(() => (authMode.value === 'login' ? 'Masuk ke dashboard' : 'Buat akun demo'))
 const menuIconClasses: Record<DemoMonitoringMenuKey, string> = {
@@ -49,6 +139,8 @@ const menuIconClasses: Record<DemoMonitoringMenuKey, string> = {
   services: 'fa-server',
   incidents: 'fa-triangle-exclamation',
   alerts: 'fa-bell',
+  'voice-chat': 'fa-microphone-lines',
+  location: 'fa-location-dot',
   settings: 'fa-gear',
 }
 
@@ -75,6 +167,7 @@ function submitAuth() {
 }
 
 function logout() {
+  if (journeyState.value === 'tracking') stopJourney()
   isAuthenticated.value = false
   activeMenu.value = 'home'
   form.password = ''
@@ -84,6 +177,7 @@ function logout() {
 
 function selectMenu(key: DemoMonitoringMenuKey) {
   activeMenu.value = key
+  void router.replace({ query: key === 'voice-chat' || key === 'location' ? { menu: key } : {} })
 }
 
 function toggleSidebar() {
@@ -93,6 +187,161 @@ function toggleSidebar() {
 function toggleTheme() {
   isDarkMode.value = !isDarkMode.value
 }
+
+function updateMarkedLocation(position: GeolocationPosition) {
+  markedLocation.value = {
+    latitude: position.coords.latitude,
+    longitude: position.coords.longitude,
+  }
+}
+
+function focusMyLocation() {
+  if (!navigator.geolocation) {
+    locationStatus.value = 'Geolocation tidak tersedia di browser ini.'
+    return
+  }
+
+  locationStatus.value = 'Meminta izin lokasi perangkat...'
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      updateMarkedLocation(position)
+      locationStatus.value = 'Map focused on your current location.'
+    },
+    (error) => {
+      locationStatus.value =
+        error.code === error.PERMISSION_DENIED
+          ? 'Izin lokasi ditolak. Izinkan lokasi untuk menandainya di peta.'
+          : 'Lokasi perangkat belum dapat ditemukan.'
+    },
+    geolocationOptions,
+  )
+}
+
+function openJourneyStart() {
+  if (journeyState.value === 'tracking') return
+  journeyNameInput.value = ''
+  isJourneyNamePromptOpen.value = true
+  journeyStatus.value = 'Enter a journey name before starting.'
+}
+
+function cancelJourneyStart() {
+  isJourneyNamePromptOpen.value = false
+  journeyNameInput.value = ''
+  journeyStatus.value = 'Ready to start a journey.'
+}
+
+function confirmJourneyStart() {
+  const name = journeyNameInput.value.trim()
+  if (!name) {
+    journeyStatus.value = 'Enter a journey name before starting.'
+    return
+  }
+
+  isJourneyNamePromptOpen.value = false
+  startJourney(name)
+}
+
+function startJourney(name: string) {
+  if (!navigator.geolocation) {
+    journeyStatus.value = 'Geolocation is not available in this browser.'
+    return
+  }
+
+  if (locationWatchId !== null) return
+
+  journeyStops.value = []
+  const startedAt = Date.now()
+  currentJourney.value = {
+    id: startedAt,
+    name,
+    startedAt,
+    stoppedAt: null,
+    events: [
+      {
+        type: 'start',
+        location: markedLocation.value ? { ...markedLocation.value } : null,
+        timestamp: startedAt,
+      },
+    ],
+  }
+  journeyState.value = 'tracking'
+  journeyStatus.value = `Journey "${name}" started. Tracking your location...`
+  locationWatchId = navigator.geolocation.watchPosition(
+    (position) => {
+      updateMarkedLocation(position)
+      locationStatus.value = 'Live location updated.'
+    },
+    (error) => {
+      journeyStatus.value =
+        error.code === error.PERMISSION_DENIED
+          ? 'Location permission denied. Allow location to track the journey.'
+          : 'Unable to update the live location.'
+    },
+    geolocationOptions,
+  )
+}
+
+function markJourneyStop() {
+  if (journeyState.value !== 'tracking') {
+    journeyStatus.value = 'Start a journey before marking a stop.'
+    return
+  }
+
+  if (!markedLocation.value) {
+    journeyStatus.value = 'Waiting for a location before marking a stop.'
+    return
+  }
+
+  journeyStops.value.push({ ...markedLocation.value })
+  currentJourney.value?.events.push({
+    type: 'mark',
+    location: { ...markedLocation.value },
+    timestamp: Date.now(),
+  })
+  journeyStatus.value = `Stop ${journeyStops.value.length} marked at your current location.`
+}
+
+function stopJourney() {
+  if (locationWatchId !== null) {
+    navigator.geolocation.clearWatch(locationWatchId)
+    locationWatchId = null
+  }
+
+  const stoppedAt = Date.now()
+  if (currentJourney.value) {
+    currentJourney.value.stoppedAt = stoppedAt
+    currentJourney.value.events.push({
+      type: 'stop',
+      location: markedLocation.value ? { ...markedLocation.value } : null,
+      timestamp: stoppedAt,
+    })
+    journeyHistory.value.unshift({
+      ...currentJourney.value,
+      events: [...currentJourney.value.events],
+    })
+    currentJourney.value = null
+  }
+
+  journeyState.value = 'stopped'
+  journeyStatus.value = `Journey stopped. ${journeyStops.value.length} stop(s) marked.`
+}
+
+function clearLocation() {
+  markedLocation.value = null
+  locationStatus.value = 'Penanda lokasi dihapus. Peta kembali ke Jakarta.'
+}
+
+watch(
+  [activeMenu, isAuthenticated],
+  ([menu, authenticated]) => {
+    if (menu === 'location' && authenticated && !markedLocation.value) focusMyLocation()
+  },
+  { immediate: true },
+)
+
+onBeforeUnmount(() => {
+  if (locationWatchId !== null) navigator.geolocation.clearWatch(locationWatchId)
+})
 </script>
 
 <template>
@@ -464,6 +713,143 @@ function toggleTheme() {
                 </div>
                 <b :class="{ active: alert.state === 'Active' }">{{ alert.state }}</b>
               </article>
+            </section>
+          </section>
+
+          <section v-else-if="activeMenu === 'voice-chat'" class="demo-dashboard-view demo-voice-chat-view">
+            <VoiceChatView :embedded="true" />
+          </section>
+
+          <section v-else-if="activeMenu === 'location'" class="demo-dashboard-view demo-location-view">
+            <div class="demo-view-heading">
+              <div>
+                <p class="demo-eyebrow">LOCATION</p>
+                <h2>Monitoring map</h2>
+              </div>
+              <span class="demo-panel-count">OpenStreetMap / CITY VIEW</span>
+            </div>
+            <section class="demo-panel demo-location-panel">
+              <div class="demo-location-map-frame">
+                <iframe
+                  class="demo-location-map"
+                  title="Peta lokasi monitoring"
+                  :src="locationMapUrl"
+                  loading="lazy"
+                ></iframe>
+                <div class="demo-location-map-tools">
+                  <button class="demo-location-focus-button" type="button" aria-label="Focus on my location" @click="focusMyLocation">
+                    <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
+                    <span>Focus</span>
+                  </button>
+                  <a class="demo-location-full-map-link" :href="fullLocationMapUrl" target="_blank" rel="noreferrer">
+                    <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+                    <span>Open full map</span>
+                  </a>
+                </div>
+              </div>
+              <div class="demo-location-meta">
+                <div>
+                  <span class="demo-eyebrow">ACTIVE LOCATION</span>
+                  <strong>{{ locationLabel }}</strong>
+                </div>
+              </div>
+              <p v-if="locationStatus" class="demo-location-status" role="status">{{ locationStatus }}</p>
+            </section>
+            <section class="demo-panel demo-journey-panel">
+              <div class="demo-panel-heading">
+                <div>
+                  <p class="demo-eyebrow">JELAJAH</p>
+                  <h2>Weekly journeys</h2>
+                </div>
+                <span class="demo-panel-count">SESSION ONLY</span>
+              </div>
+              <p class="demo-journey-copy">Name a journey before starting. Start, Mark, Stop, and Clear location stay in this session.</p>
+              <form v-if="isJourneyNamePromptOpen" class="demo-journey-name-form" @submit.prevent="confirmJourneyStart">
+                <label for="journey-name">Journey name</label>
+                <div class="demo-journey-name-fields">
+                  <input
+                    id="journey-name"
+                    v-model="journeyNameInput"
+                    type="text"
+                    placeholder="e.g. Morning route"
+                    maxlength="80"
+                    required
+                    autofocus
+                  />
+                  <button class="demo-journey-button demo-journey-button-start" type="submit">
+                    <i class="fa-solid fa-play" aria-hidden="true"></i>
+                    <span>Start journey</span>
+                  </button>
+                  <button class="demo-journey-button demo-journey-button-cancel" type="button" @click="cancelJourneyStart">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+              <div class="demo-journey-controls" aria-label="Journey controls">
+                <div class="demo-journey-buttons">
+                  <button
+                    class="demo-journey-button demo-journey-button-start"
+                    type="button"
+                    :disabled="journeyState === 'tracking'"
+                    @click="openJourneyStart"
+                  >
+                    <i class="fa-solid fa-play" aria-hidden="true"></i>
+                    <span>Start</span>
+                  </button>
+                  <button
+                    class="demo-journey-button demo-journey-button-mark"
+                    type="button"
+                    :disabled="journeyState !== 'tracking' || !markedLocation"
+                    @click="markJourneyStop"
+                  >
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                    <span>Mark</span>
+                  </button>
+                  <button
+                    class="demo-journey-button demo-journey-button-stop"
+                    type="button"
+                    :disabled="journeyState !== 'tracking'"
+                    @click="stopJourney"
+                  >
+                    <i class="fa-solid fa-stop" aria-hidden="true"></i>
+                    <span>Stop</span>
+                  </button>
+                  <button
+                    class="demo-journey-button demo-journey-button-clear"
+                    type="button"
+                    :disabled="!markedLocation"
+                    @click="clearLocation"
+                  >
+                    <i class="fa-solid fa-location-xmark" aria-hidden="true"></i>
+                    <span>Clear location</span>
+                  </button>
+                </div>
+                <div class="demo-journey-status" role="status">
+                  <i class="demo-journey-status-dot" :class="journeyState" aria-hidden="true"></i>
+                  <span>{{ journeyStatus }}</span>
+                  <small v-if="journeyStops.length">{{ journeyStops.length }} stop(s)</small>
+                </div>
+              </div>
+              <div v-if="currentJourney" class="demo-current-journey">
+                <span class="demo-eyebrow">ACTIVE JOURNEY</span>
+                <strong>{{ currentJourney.name }}</strong>
+              </div>
+              <div class="demo-journey-history">
+                <div v-if="weeklyJourneys.length" v-for="week in weeklyJourneys" :key="week.key" class="demo-journey-week">
+                  <div class="demo-journey-week-heading">
+                    <span>{{ week.label }}</span>
+                    <small>{{ week.journeys.length }} journey(s)</small>
+                  </div>
+                  <article v-for="journey in week.journeys" :key="journey.id" class="demo-journey-history-row">
+                    <div>
+                      <strong>{{ journey.name }}</strong>
+                      <small>{{ journey.events.length }} recorded point(s)</small>
+                    </div>
+                    <span>Completed</span>
+                  </article>
+                </div>
+                <p v-else class="demo-journey-empty">No completed journeys this session.</p>
+              </div>
             </section>
           </section>
 
@@ -1052,6 +1438,56 @@ function toggleTheme() {
 .demo-view-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
 .demo-view-heading .demo-eyebrow { margin-bottom: 6px; }
 .demo-view-heading h2 { color: var(--demo-heading); font-size: clamp(1.25rem, 2.4vw, 1.8rem); letter-spacing: -0.04em; }
+.demo-location-panel { overflow: hidden; }
+.demo-location-map-frame { position: relative; min-height: 520px; background: #d9e5e8; }
+.demo-location-map { display: block; width: 100%; height: 520px; border: 0; }
+.demo-location-map-tools { position: absolute; right: 16px; bottom: 16px; z-index: 2; display: flex; align-items: center; gap: 8px; }
+.demo-location-focus-button,
+.demo-location-full-map-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 12px; color: #f6fbff; background: rgba(7, 24, 43, 0.9); border: 1px solid rgba(183, 216, 244, 0.35); border-radius: 9px; box-shadow: 0 10px 24px rgba(2, 11, 20, 0.25); font-size: 0.7rem; font-weight: 800; text-decoration: none; }
+.demo-location-focus-button:hover,
+.demo-location-full-map-link:hover { color: #a7edff; border-color: #a7edff; }
+.demo-journey-panel { display: grid; gap: 16px; margin-top: 14px; }
+.demo-journey-copy { margin: 0; color: var(--demo-muted); font-size: 0.72rem; }
+.demo-journey-name-form { display: grid; gap: 8px; padding: 14px; background: rgba(9, 29, 48, 0.42); border: 1px solid var(--demo-divider); border-radius: 10px; }
+.demo-journey-name-form label { color: var(--demo-copy); font-size: 0.68rem; font-weight: 800; }
+.demo-journey-name-fields { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-journey-name-fields input { min-width: min(280px, 100%); flex: 1 1 220px; padding: 9px 11px; color: var(--demo-text); background: var(--demo-input); border: 1px solid var(--demo-border); border-radius: 8px; font: inherit; font-size: 0.72rem; }
+.demo-journey-name-fields input:focus { outline: 2px solid rgba(167, 237, 255, 0.45); outline-offset: 1px; }
+.demo-journey-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0; }
+.demo-journey-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-journey-button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; color: var(--demo-copy); background: transparent; border: 1px solid rgba(183, 216, 244, 0.28); border-radius: 8px; font-size: 0.68rem; font-weight: 800; }
+.demo-journey-button:hover:not(:disabled) { color: var(--demo-heading); border-color: #a7edff; background: rgba(167, 237, 255, 0.08); }
+.demo-journey-button:disabled { cursor: not-allowed; opacity: 0.4; }
+.demo-journey-button-start { color: #9ff0c4; border-color: rgba(121, 232, 169, 0.35); }
+.demo-journey-button-mark { color: #a7edff; border-color: rgba(167, 237, 255, 0.35); }
+.demo-journey-button-stop { color: #ffc36b; border-color: rgba(255, 195, 107, 0.35); }
+.demo-journey-button-clear { color: #ffb5b5; border-color: rgba(255, 181, 181, 0.35); }
+.demo-journey-button-cancel { color: var(--demo-muted); }
+.demo-journey-status { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; color: var(--demo-muted); font-size: 0.68rem; text-align: right; }
+.demo-journey-status > span { max-width: 360px; }
+.demo-journey-status small { color: var(--demo-copy); font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; white-space: nowrap; }
+.demo-journey-status-dot { width: 7px; height: 7px; flex: 0 0 auto; background: #8da4b4; border-radius: 50%; }
+.demo-journey-status-dot.tracking { background: #79e8a9; box-shadow: 0 0 0 5px rgba(121, 232, 169, 0.12); }
+.demo-journey-status-dot.stopped { background: #ffc36b; }
+.demo-current-journey { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; border-top: 1px solid var(--demo-divider); border-bottom: 1px solid var(--demo-divider); }
+.demo-current-journey .demo-eyebrow { margin: 0; }
+.demo-current-journey strong { color: var(--demo-heading); font-size: 0.78rem; }
+.demo-journey-history { display: grid; gap: 14px; }
+.demo-journey-week { display: grid; gap: 7px; }
+.demo-journey-week-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--demo-copy); font-size: 0.68rem; font-weight: 800; }
+.demo-journey-week-heading small { color: var(--demo-muted); font-size: 0.6rem; font-weight: 600; }
+.demo-journey-history-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; background: rgba(167, 237, 255, 0.04); border: 1px solid var(--demo-divider); border-radius: 8px; }
+.demo-journey-history-row strong,
+.demo-journey-history-row small { display: block; }
+.demo-journey-history-row strong { color: var(--demo-text); font-size: 0.72rem; }
+.demo-journey-history-row small { margin-top: 3px; color: var(--demo-muted); font-size: 0.6rem; }
+.demo-journey-history-row > span { color: #79e8a9; font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; }
+.demo-journey-empty { margin: 0; color: var(--demo-muted); font-size: 0.68rem; }
+.demo-location-meta { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 20px; border-top: 1px solid var(--demo-border); }
+.demo-location-meta > div { display: grid; gap: 5px; }
+.demo-location-meta .demo-eyebrow { margin: 0; }
+.demo-location-meta strong { color: var(--demo-heading); font-size: 0.95rem; }
+.demo-location-status { margin: 0; padding: 0 20px 16px; color: var(--demo-muted); font-size: 0.7rem; }
 .demo-live-indicator { color: #79e8a9; font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; }
 .demo-live-indicator i { width: 7px; height: 7px; background: #79e8a9; border-radius: 50%; box-shadow: 0 0 0 5px rgba(121, 232, 169, 0.12); }
 .demo-metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }

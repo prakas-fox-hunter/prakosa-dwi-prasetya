@@ -16,6 +16,8 @@ export type DemoMonitoringMenuKey =
   | 'services'
   | 'incidents'
   | 'alerts'
+  | 'voice-chat'
+  | 'location'
   | 'settings'
 
 export type DemoMonitoringMenuItem = {
@@ -40,6 +42,23 @@ export const demoMonitoringMenu: DemoMonitoringMenuItem[] = [
   { key: 'alerts', label: 'Alerts', description: 'Notifikasi dan aturan peringatan.', icon: '◉' },
   { key: 'settings', label: 'Settings', description: 'Preferensi dashboard dan workspace.', icon: '⚙' },
 ]
+
+demoMonitoringMenu.splice(
+  5,
+  0,
+  {
+    key: 'voice-chat',
+    label: 'Voice Chat',
+    description: 'Transkripsi suara langsung di dalam monitoring.',
+    icon: 'voice',
+  },
+  {
+    key: 'location',
+    label: 'Location',
+    description: 'Lihat lokasi pada peta monitoring.',
+    icon: 'location',
+  },
+)
 
 export const demoSwaggerEndpoints: DemoSwaggerEndpoint[] = [
   {

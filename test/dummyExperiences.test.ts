@@ -33,7 +33,7 @@ test('demo registration stays local and permissive for the prototype', () => {
 test('monitoring dashboard exposes conventional sidebar menu items', () => {
   assert.deepEqual(
     demoMonitoringMenu.map((item) => item.label),
-    ['Home', 'Overview', 'Services', 'Incidents', 'Alerts', 'Settings'],
+    ['Home', 'Overview', 'Services', 'Incidents', 'Alerts', 'Voice Chat', 'Location', 'Settings'],
   )
 })
 

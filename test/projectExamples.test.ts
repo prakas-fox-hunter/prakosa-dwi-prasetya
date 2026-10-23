@@ -4,7 +4,7 @@ import test from 'node:test'
 
 import { demoProjectExamples } from '../src/utils/projectExamples.ts'
 
-test('project examples expose monitoring and Swagger cards with local routes', () => {
+test('project examples expose only monitoring and Swagger cards with local routes', () => {
   assert.deepEqual(
     demoProjectExamples.map((project) => ({ slug: project.slug, icon: project.icon, route: project.route })),
     [

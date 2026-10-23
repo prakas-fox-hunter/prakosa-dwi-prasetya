@@ -22,6 +22,11 @@ const router = createRouter({
       component: DummySwaggerView,
     },
     {
+      path: '/voice-chat',
+      name: 'voice-chat',
+      redirect: '/dummy-monitoring?menu=voice-chat',
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/',
     },
